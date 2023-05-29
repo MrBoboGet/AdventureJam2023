@@ -3,9 +3,12 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.EventSystems;
-public class CardScript : MonoBehaviour,IDragHandler,IPointerClickHandler,IDropHandler
+public class CardScript : MonoBehaviour,IDragHandler,IDropHandler
 {
     Vector2 m_OriginalPosition;
+    public Card CardValue;
+    public int CardIndex = 0;
+    public PokerHandler AssociatedHandler;
     // Start is called before the first frame update
     void Start()
     {
@@ -14,18 +17,28 @@ public class CardScript : MonoBehaviour,IDragHandler,IPointerClickHandler,IDropH
     public void OnDrag(PointerEventData Data)
     {
         transform.position = Data.position;
-        print("asdsad");
     }
     // Update is called once per frame
     void Update()
     {
     }
 
-    public void OnPointerClick(PointerEventData eventData)
-    {
-        print("Clicking");
-    }
 
+
+    public void Drop()
+    {
+        transform.localScale = new Vector3(0.5f, 0.5f, 0.5f);
+        enabled = false;
+    }
+    public void SetPosition(Vector2 NewPosition)
+    {
+        m_OriginalPosition = NewPosition;
+        gameObject.transform.localPosition = NewPosition;
+    }
+    public void ResetPosition()
+    {
+        gameObject.transform.position = m_OriginalPosition;
+    }
     public void OnDrop(PointerEventData eventData)
     {
         Camera GlobalCamera = FindObjectOfType<Camera>();
@@ -33,12 +46,12 @@ public class CardScript : MonoBehaviour,IDragHandler,IPointerClickHandler,IDropH
             GlobalCamera.ScreenToWorldPoint(eventData.position), GlobalCamera.transform.forward,Mathf.Infinity,1<<LayerMask.NameToLayer("Table"));
         if(TableHit.collider == null)
         {
-            transform.position = m_OriginalPosition;
+            //transform.position = m_OriginalPosition;
+            ResetPosition();
         }
         else
         {
-            transform.localScale = new Vector3(0.5f, 0.5f, 0.5f);
-            Destroy(this);
+            AssociatedHandler.CardDropped(this, DropType.Table);
         }
     }
 }
