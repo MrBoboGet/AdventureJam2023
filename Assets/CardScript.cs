@@ -9,6 +9,7 @@ public class CardScript : MonoBehaviour,IDragHandler,IDropHandler
     public Card CardValue;
     public int CardIndex = 0;
     public PokerHandler AssociatedHandler;
+    public bool Hover = false;
     // Start is called before the first frame update
     void Start()
     {
@@ -47,7 +48,16 @@ public class CardScript : MonoBehaviour,IDragHandler,IDropHandler
         if(TableHit.collider == null)
         {
             //transform.position = m_OriginalPosition;
-            ResetPosition();
+            RaycastHit2D OpponentHit = Physics2D.Raycast(
+                GlobalCamera.ScreenToWorldPoint(eventData.position), GlobalCamera.transform.forward, Mathf.Infinity, 1 << LayerMask.NameToLayer("Opponent"));
+            if(OpponentHit.collider != null)
+            {
+                AssociatedHandler.CardDropped(this, DropType.Opponent);
+            }
+            else
+            {
+                ResetPosition();
+            }
         }
         else
         {
