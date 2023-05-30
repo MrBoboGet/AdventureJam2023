@@ -9,7 +9,7 @@ public enum DropType
     Opponent
 }
 
-
+[System.Serializable]
 public class NPCOpponent
 {
     public Sprite Neutral;
@@ -19,7 +19,7 @@ public class NPCOpponent
     public Sprite HandGrab;
 
 
-    public List<Card> Hand;
+    public List<Card> Hand = new List<Card>();
 }
 
 
@@ -28,7 +28,7 @@ public class PokerHandler : MonoBehaviour
 {
     class PickHandler
     {
-        public List<GameObject> ObjectsToArrange;
+        public List<GameObject> ObjectsToArrange = new List<GameObject>();
         public bool PlayerPicking = true;
         public NPCOpponent Opponent;
 
@@ -47,30 +47,43 @@ public class PokerHandler : MonoBehaviour
             GameObject CardScene = GameObject.FindGameObjectWithTag("PickScene");
             m_OpponentObject = GameObject.FindGameObjectWithTag("Opponent");
             //set opponent sprite
-            m_OpponentObject.GetComponent<UnityEngine.UI.Image>().sprite = Opponent.Neutral;
+            m_OpponentObject.GetComponent<SpriteRenderer>().sprite = Opponent.Neutral;
             Canvas AssociatedCanvas = CardScene.GetComponentInChildren<Canvas>();
             foreach(GameObject Object in ObjectsToArrange)
             {
                 Object.transform.parent = AssociatedCanvas.gameObject.transform;
             }
-            for(int i = 0; i < 5;i++)
+            for(int i = 0; i < ObjectsToArrange.Count;i++)
             {
-                new Vector2(-400 + i * 200, -100);
+                ObjectsToArrange[i].transform.localPosition = new Vector2(-400 + i * 200, -260);
+                ObjectsToArrange[i].GetComponent<RectTransform>().sizeDelta = new Vector2(175, ObjectsToArrange[i].GetComponent<RectTransform>().sizeDelta.y);
             }
 
         }
         public void HoverEnter(int CardIndex)
         {
+            if(m_OpponentObject == null)
+            {
+                return;
+            }
             if(CardIndex == 2)
             {
-                m_OpponentObject.GetComponent<UnityEngine.UI.Image>().sprite = Opponent.Tell;
+                m_OpponentObject.GetComponent<SpriteRenderer>().sprite = Opponent.Tell;
             }
             else
             {
-                m_OpponentObject.GetComponent<UnityEngine.UI.Image>().sprite = Opponent.Neutral;
+                m_OpponentObject.GetComponent<SpriteRenderer>().sprite = Opponent.Neutral;
             }
         }
-        
+        public void HoverLeave(int CardIndex)
+        {
+            if (m_OpponentObject == null)
+            {
+                return;
+            }
+            m_OpponentObject.GetComponent<SpriteRenderer>().sprite = Opponent.Neutral;
+        }
+
         public void CardClicked(int Index)
         {
             m_PickedCardIndex = Index;
@@ -79,7 +92,7 @@ public class PokerHandler : MonoBehaviour
     // Start is called before the first frame update
     public GameObject CardPrefab;
     public GameObject SelectCardScene;
-    public NPCOpponent TempOpponent;
+    public NPCOpponent TempOpponent = new NPCOpponent();
 
     PickHandler m_PickHandler = null;
 
@@ -116,8 +129,9 @@ public class PokerHandler : MonoBehaviour
         {
             m_Hand.Add(null);
         }
+        m_SceneObject = GameObject.FindGameObjectWithTag("PokerScene");
         m_AssociatedDeck = FindObjectOfType<Deck>();
-        m_GlobalCanvas = FindObjectOfType<Canvas>();
+        m_GlobalCanvas = m_SceneObject.GetComponentInChildren<Canvas>();
         //create hand
         for(int i = 0; i < 5;i++)
         {
@@ -132,12 +146,29 @@ public class PokerHandler : MonoBehaviour
             m_PickHandler.CardClicked(AssociatedCard.CardIndex);
         }
     }
+    public void CardHoverEnter(CardScript AssociatedCard)
+    {
+        if(m_PickHandler != null)
+        {
+            m_PickHandler.HoverEnter(AssociatedCard.CardIndex);
+        }
+    }
+    public void CardHoverLeave(CardScript AssociatedCard)
+    {
+        if (m_PickHandler != null)
+        {
+            m_PickHandler.HoverLeave(AssociatedCard.CardIndex);
+        }
+    }
+
+    int m_ReplacedCardIndex = 0;
     public void CardDropped(CardScript AssociatedCard,DropType Type)
     {
         if(Type == DropType.Opponent)
         {
             //AssociatedCard.ResetPosition();
             //print("Opponent");
+            m_ReplacedCardIndex = AssociatedCard.CardIndex;
             m_PickHandler = new PickHandler();
             m_PickHandler.PlayerPicking = true;
             m_PickHandler.Opponent = TempOpponent;
@@ -148,11 +179,15 @@ public class PokerHandler : MonoBehaviour
             {
                 GameObject NewCard = Instantiate(CardPrefab);
                 CardScript AssociatedScript = NewCard.GetComponent<CardScript>();
+                AssociatedScript.CardIndex = i;
                 AssociatedScript.Hover = false;
                 m_PickHandler.ObjectsToArrange.Add(AssociatedScript.gameObject);
+                AssociatedScript.GetComponent<UnityEngine.UI.Image>().sprite = m_AssociatedDeck.GetCardBack();
+                AssociatedScript.AssociatedHandler = this;
                 //AssociatedScript.gameObject.transform.parent = m_GlobalCanvas.gameObject.transform;
             }
             m_PickHandler.Initialize();
+            AssociatedCard.ResetPosition();
         }
         else if(Type == DropType.Table)
         {
@@ -162,11 +197,17 @@ public class PokerHandler : MonoBehaviour
         }
     }
 
+    bool m_Initialised = false;
     // Update is called once per frame
     void Update()
     {
         if(m_PickHandler != null)
         {
+            if(!m_Initialised)
+            {
+                m_PickHandler.Initialize();
+                m_Initialised = true;
+            }
             int CardIndex = m_PickHandler.Update();
             if(CardIndex != -1)
             {
@@ -174,8 +215,17 @@ public class PokerHandler : MonoBehaviour
                 TempOpponent.Hand[CardIndex] = m_AssociatedDeck.DrawCard();
                 CardScript PlayerCard = m_Hand[CardIndex].GetComponent<CardScript>();
                 PlayerCard.CardValue = PickedCard;
-                m_Hand[CardIndex].GetComponent<UnityEngine.UI.Image>().sprite = m_AssociatedDeck.GetSprite(PlayerCard.CardValue);
+                m_Hand[m_ReplacedCardIndex].GetComponent<UnityEngine.UI.Image>().sprite = m_AssociatedDeck.GetSprite(PlayerCard.CardValue);
+
+                m_SceneObject.SetActive(true);
+
+                Destroy(GameObject.FindGameObjectWithTag("PickScene"));
+                m_PickHandler = null;
             }
+        }
+        else
+        {
+            m_Initialised = false;
         }
     }
 }

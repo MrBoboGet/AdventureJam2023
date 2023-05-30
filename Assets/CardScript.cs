@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.EventSystems;
-public class CardScript : MonoBehaviour,IDragHandler,IDropHandler
+public class CardScript : MonoBehaviour,IDragHandler,IDropHandler,IPointerEnterHandler,IPointerClickHandler,IPointerExitHandler
 {
     Vector2 m_OriginalPosition;
     public Card CardValue;
@@ -63,5 +63,20 @@ public class CardScript : MonoBehaviour,IDragHandler,IDropHandler
         {
             AssociatedHandler.CardDropped(this, DropType.Table);
         }
+    }
+
+    public void OnPointerEnter(PointerEventData eventData)
+    {
+        AssociatedHandler.CardHoverEnter(this);
+    }
+
+    public void OnPointerClick(PointerEventData eventData)
+    {
+        AssociatedHandler.CardClicked(this);
+    }
+
+    public void OnPointerExit(PointerEventData eventData)
+    {
+        AssociatedHandler.CardHoverLeave(this);
     }
 }

@@ -22,7 +22,7 @@ public class Card
 public class Deck : MonoBehaviour
 {
     public List<Sprite> DeckSprites;
-
+    public Sprite CardBack;
 
     List<Card> m_CurrentDeck;
 
@@ -98,6 +98,10 @@ public class Deck : MonoBehaviour
     public Sprite GetSprite(Card AssociatedCard)
     {
         return (DeckSprites[ m_SpriteMap[AssociatedCard.Value - 1][AssociatedCard.Type]]);
+    }
+    public Sprite GetCardBack()
+    {
+        return (CardBack);
     }
     public Card DrawCard()
     {
