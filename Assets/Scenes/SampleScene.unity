@@ -1220,6 +1220,10 @@ PrefabInstance:
       propertyPath: TempOpponent.PickHand
       value: 
       objectReference: {fileID: 21300000, guid: 24ec02845c545fa4dbe83c176a28bd3a, type: 3}
+    - target: {fileID: 753837164739554619, guid: 35251ac4c6cc6b04abec13279828674d, type: 3}
+      propertyPath: OpponentSelectCardScene
+      value: 
+      objectReference: {fileID: 611083731291077903, guid: 455578e463931b04782fd36c67961cd6, type: 3}
     - target: {fileID: 4008845213441231937, guid: 35251ac4c6cc6b04abec13279828674d, type: 3}
       propertyPath: m_RootOrder
       value: 3

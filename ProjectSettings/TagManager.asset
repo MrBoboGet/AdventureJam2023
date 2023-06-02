@@ -7,6 +7,8 @@ TagManager:
   - Opponent
   - PickScene
   - PokerScene
+  - OpponentPickScene
+  - Hand
   layers:
   - Default
   - TransparentFX

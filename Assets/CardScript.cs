@@ -17,6 +17,10 @@ public class CardScript : MonoBehaviour,IDragHandler,IDropHandler,IPointerEnterH
     }
     public void OnDrag(PointerEventData Data)
     {
+        if(Hover)
+        {
+            return;
+        }
         transform.position = Data.position;
     }
     // Update is called once per frame

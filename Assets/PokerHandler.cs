@@ -26,6 +26,96 @@ public class NPCOpponent
 
 public class PokerHandler : MonoBehaviour
 {
+    class HandAnimation
+    {
+        public void Initialize()
+        {
+            //get scene object
+            GameObject CardScene = GameObject.FindGameObjectWithTag("OpponentPickScene");
+            AssociatedObject = GameObject.FindGameObjectWithTag("Hand");
+            //set opponent sprite
+            Canvas AssociatedCanvas = CardScene.GetComponentInChildren<Canvas>();
+            foreach (GameObject Object in m_CardPositions)
+            {
+                Object.transform.parent = AssociatedCanvas.gameObject.transform;
+            }
+            for (int i = 0; i < m_CardPositions.Count; i++)
+            {
+                m_CardPositions[i].transform.localPosition = new Vector2(-400 + i * 200, -260);
+                m_CardPositions[i].GetComponent<RectTransform>().sizeDelta = new Vector2(175, m_CardPositions[i].GetComponent<RectTransform>().sizeDelta.y);
+            }
+        }
+        public HandAnimation(List<GameObject> CardPositions)
+        {
+            m_CardPositions = CardPositions;
+        }
+
+        GameObject AssociatedObject;
+        List<GameObject> m_CardPositions;
+        float m_HoverLength= 3;
+        float m_HoverSpeed = 8f;
+        float m_GrabDelay = 0.5f;
+        float m_GrabSpeed = 30f;
+        float m_GrabYLocation = 1f;
+        float m_ElapsedAnimation = 0;
+        int m_CurrentCardTarget = 0;
+
+        float m_ElapsedGrabTime= 0;
+
+        int m_GrabbedCardIndex = -1;
+
+        float m_GrabbTransitionDelay = 1f;
+        float m_ElapsedGrabTransition = 0;
+        public int Update()
+        {
+            if (AssociatedObject == null)
+            {
+                return (-1);
+            }
+            Vector2 TargetDestination = m_CardPositions[m_CurrentCardTarget].transform.position;
+            TargetDestination = FindObjectOfType<Camera>().ScreenToWorldPoint(TargetDestination);
+            if (m_ElapsedAnimation < m_HoverLength ||  Mathf.Abs(TargetDestination.x - AssociatedObject.transform.position.x) > 0.1f)
+            {
+                //only use X
+                float XDiff = TargetDestination.x - AssociatedObject.transform.position.x;
+
+                float XToAdd = Mathf.Min(Mathf.Abs(XDiff), m_HoverSpeed*Time.deltaTime) * Mathf.Sign(XDiff);
+                AssociatedObject.transform.position += new Vector3(XToAdd, 0);
+                if (Mathf.Abs(XToAdd) != m_HoverSpeed * Time.deltaTime)
+                {
+                    int CurrentTarget = m_CurrentCardTarget;
+                    while (CurrentTarget == m_CurrentCardTarget)
+                    {
+                        m_CurrentCardTarget = (int)Random.Range(0.0f, 4.999f);
+                    }
+                }
+                m_ElapsedAnimation += Time.deltaTime;
+            }
+            else
+            {
+                m_ElapsedGrabTime += Time.deltaTime;
+                if (m_ElapsedGrabTime > m_GrabDelay)
+                {
+                    if (Mathf.Abs(AssociatedObject.transform.position.y - m_GrabYLocation) < 0.1f)
+                    {
+                        m_ElapsedGrabTransition += Time.deltaTime;
+                        if (m_ElapsedGrabTransition > m_GrabbTransitionDelay)
+                        {
+                            m_GrabbedCardIndex = 1;
+                        }
+                    }
+                    else
+                    {
+                        float YDiff = m_GrabYLocation - AssociatedObject.transform.position.y;
+                        float YDiffToAdd = Mathf.Min(m_GrabSpeed * Time.deltaTime, Mathf.Abs(YDiff)) * Mathf.Sign(YDiff);
+                        AssociatedObject.transform.position += new Vector3(0, YDiffToAdd);
+                    }
+                }
+            }
+            return (m_GrabbedCardIndex);
+        }
+
+    }
     class PickHandler
     {
         public List<GameObject> ObjectsToArrange = new List<GameObject>();
@@ -36,9 +126,18 @@ public class PokerHandler : MonoBehaviour
 
 
         GameObject m_OpponentObject = null;
+        GameObject m_HandObject = null;
         //returns index of picked card
+        int m_FinessIndex = -1;
         public int Update()
         {
+            if(!PlayerPicking)
+            {
+                if(m_FinessIndex != -1)
+                {
+                    m_FinessIndex -= 1;
+                }
+            }
             return m_PickedCardIndex;
         }
         public void Initialize()
@@ -92,9 +191,11 @@ public class PokerHandler : MonoBehaviour
     // Start is called before the first frame update
     public GameObject CardPrefab;
     public GameObject SelectCardScene;
+    public GameObject OpponentSelectCardScene;
     public NPCOpponent TempOpponent = new NPCOpponent();
 
     PickHandler m_PickHandler = null;
+    HandAnimation m_OpponentPickHandler = null;
 
     Deck m_AssociatedDeck;
     List<GameObject> m_Hand;
@@ -223,9 +324,48 @@ public class PokerHandler : MonoBehaviour
                 m_PickHandler = null;
             }
         }
-        else
+        else if(m_OpponentPickHandler != null)
+        {
+            if(!m_Initialised)
+            {
+                m_OpponentPickHandler.Initialize();
+                m_Initialised = true;
+            }
+            int GrabbedCardIndex = m_OpponentPickHandler.Update();
+            if(GrabbedCardIndex != -1)
+            {
+                DrawCard(GrabbedCardIndex);
+                m_SceneObject.SetActive(true);
+                Destroy(GameObject.FindGameObjectWithTag("OpponentPickScene"));
+                m_OpponentPickHandler = null;
+            }
+        }
+        else 
         {
             m_Initialised = false;
+        }
+
+
+        //Test pick handler
+        if(Input.GetKeyDown(KeyCode.P))
+        {
+            //AssociatedCard.ResetPosition();
+            //print("Opponent");
+            //create cards
+            m_SceneObject.SetActive(false);
+            Instantiate(OpponentSelectCardScene);
+            List<GameObject> CardObjects = new List<GameObject>();
+            for (int i = 0; i < 5; i++)
+            {
+                GameObject NewCard = Instantiate(CardPrefab);
+                CardScript AssociatedScript = NewCard.GetComponent<CardScript>();
+                AssociatedScript.CardIndex = i;
+                AssociatedScript.Hover = true;
+                AssociatedScript.GetComponent<UnityEngine.UI.Image>().sprite = m_Hand[i].GetComponent<UnityEngine.UI.Image>().sprite;
+                AssociatedScript.AssociatedHandler = this;
+                CardObjects.Add(NewCard);
+            }
+            m_OpponentPickHandler = new HandAnimation(CardObjects);
         }
     }
 }
