@@ -26,6 +26,7 @@ public class NPCOpponent
 
 public class PokerHandler : MonoBehaviour
 {
+    public GameObject CardObject;
     class HandAnimation
     {
         public void Initialize()
@@ -203,12 +204,56 @@ public class PokerHandler : MonoBehaviour
     Canvas m_GlobalCanvas;
     GameObject m_SceneObject;
 
+    class PokerState
+    {
+        public int OpponentCash = 15;
+        public int PlayerCash = 15;
+        public int OpponentPot = 0;
+        public int PlayerPot = 0;
+        public bool PlayerTurn = true;
+        public bool Call = false;
+    }
+    class OpponentTurnState
+    {
+        public float ThinkTime = 2f;
+        public float ElapsedThink = 0;
+    }
 
+
+    PokerState m_CurrentPokerState = new PokerState();
+    OpponentTurnState m_CurrentOpponentState = new OpponentTurnState();
 
     int m_DiscardedCard = 0;
     Vector2 GetPosition(int CardIndex)
     {
         return (new Vector2(-400 + CardIndex*200, -350));
+    }
+
+    void Oof()
+    {
+        print("Oof");
+    }
+    void p_InitializeNewRound()
+    {
+
+    }
+    void p_InitializeRevealSequence()
+    {
+
+    }
+    void p_InitializeDefeat()
+    {
+
+    }
+    void p_InitializeWin()
+    {
+
+    }
+
+
+    public void ShowOpponentDialog(string DialogToShow)
+    {
+
     }
 
     void DrawCard(int CardIndex)
@@ -261,10 +306,35 @@ public class PokerHandler : MonoBehaviour
             m_PickHandler.HoverLeave(AssociatedCard.CardIndex);
         }
     }
+    private IEnumerator p_ThrowCard(Vector2 Origin,Vector2 Target,Sprite AssociatedSprite)
+    {
+        GameObject CardInScene = Instantiate(CardObject);
+        CardInScene.transform.parent = m_SceneObject.transform;
+        CardInScene.transform.position = Origin;
+        CardInScene.GetComponent<SpriteRenderer>().sprite = AssociatedSprite;
+        
 
+        float ThrowSpeed = 6;
+        float RotationSpeed = 135f;
+        CardInScene.transform.eulerAngles = new Vector3(60, 0, Random.Range(0f, 360f));
+        while( ((Vector2)CardInScene.transform.position - Target).magnitude >= 0.01f)
+        {
+            Vector2 ThrowDirection = Target- (Vector2)CardInScene.transform.position;
+            ThrowDirection = ThrowDirection.normalized * Mathf.Min(ThrowSpeed * Time.deltaTime, ThrowDirection.magnitude);
+            CardInScene.transform.position += (Vector3)ThrowDirection;
+            CardInScene.transform.eulerAngles += new Vector3(0, 0,RotationSpeed*Time.deltaTime);
+            yield return null;
+        }
+    }
     int m_ReplacedCardIndex = 0;
     public void CardDropped(CardScript AssociatedCard,DropType Type)
     {
+        if(!m_CurrentPokerState.PlayerTurn || m_CurrentPokerState.Call)
+        {
+            AssociatedCard.ResetPosition();
+            Oof();
+            return;
+        }
         if(Type == DropType.Opponent)
         {
             //AssociatedCard.ResetPosition();
@@ -292,10 +362,64 @@ public class PokerHandler : MonoBehaviour
         }
         else if(Type == DropType.Table)
         {
+            Vector2 Target =FindObjectOfType<Camera>().ScreenToWorldPoint(AssociatedCard.gameObject.transform.position);
+            Vector2 Origin = new Vector2(0, -5);
+            Sprite SpriteToThrow = AssociatedCard.gameObject.GetComponent<UnityEngine.UI.Image>().sprite;
+
+            StartCoroutine(p_ThrowCard(Origin, Target, SpriteToThrow));
+
             AssociatedCard.Drop();
             //replace card
             DrawCard(AssociatedCard.CardIndex);
         }
+        m_CurrentPokerState.PlayerTurn = false;
+    }
+
+    public void OnRaise()
+    {
+        int NewTotalPot = m_CurrentPokerState.OpponentPot + 2;
+        int TotalRaise = NewTotalPot - m_CurrentPokerState.PlayerPot;
+        m_CurrentPokerState.PlayerPot += TotalRaise;
+        m_CurrentPokerState.PlayerCash -= TotalRaise;
+    }
+    public void OnMatch()
+    {
+        int NewTotalPot = m_CurrentPokerState.OpponentPot;
+        int TotalRaise = NewTotalPot - m_CurrentPokerState.PlayerPot;
+        m_CurrentPokerState.PlayerPot += TotalRaise;
+        m_CurrentPokerState.PlayerCash -= TotalRaise;
+    }
+    public void OnFold()
+    {
+        m_CurrentPokerState.OpponentCash += m_CurrentPokerState.PlayerPot + m_CurrentPokerState.OpponentPot;
+        m_CurrentPokerState.PlayerPot = 0;
+        m_CurrentPokerState.OpponentPot = 0;
+        p_InitializeNewRound();
+    }
+    public void OnCall()
+    {
+
+    }
+
+    void p_InitializeOpponentPick()
+    {
+        //AssociatedCard.ResetPosition();
+        //print("Opponent");
+        //create cards
+        m_SceneObject.SetActive(false);
+        Instantiate(OpponentSelectCardScene);
+        List<GameObject> CardObjects = new List<GameObject>();
+        for (int i = 0; i < 5; i++)
+        {
+            GameObject NewCard = Instantiate(CardPrefab);
+            CardScript AssociatedScript = NewCard.GetComponent<CardScript>();
+            AssociatedScript.CardIndex = i;
+            AssociatedScript.Hover = true;
+            AssociatedScript.GetComponent<UnityEngine.UI.Image>().sprite = m_Hand[i].GetComponent<UnityEngine.UI.Image>().sprite;
+            AssociatedScript.AssociatedHandler = this;
+            CardObjects.Add(NewCard);
+        }
+        m_OpponentPickHandler = new HandAnimation(CardObjects);
     }
 
     bool m_Initialised = false;
@@ -342,6 +466,28 @@ public class PokerHandler : MonoBehaviour
         }
         else 
         {
+            if(!m_CurrentPokerState.PlayerTurn)
+            {
+                m_CurrentOpponentState.ElapsedThink += Time.deltaTime;
+                if(m_CurrentOpponentState.ElapsedThink >= m_CurrentOpponentState.ThinkTime)
+                {
+                    //make move
+                    if(Random.Range(0,2) < 1f)
+                    {
+                        //take card
+                    }
+                    else
+                    {
+                        //do nothing
+                        p_InitializeOpponentPick();
+                    }
+                    m_CurrentPokerState.PlayerTurn = true;
+                }
+            }
+            else
+            {
+                m_CurrentOpponentState.ElapsedThink = 0;
+            }
             m_Initialised = false;
         }
 
@@ -349,23 +495,7 @@ public class PokerHandler : MonoBehaviour
         //Test pick handler
         if(Input.GetKeyDown(KeyCode.P))
         {
-            //AssociatedCard.ResetPosition();
-            //print("Opponent");
-            //create cards
-            m_SceneObject.SetActive(false);
-            Instantiate(OpponentSelectCardScene);
-            List<GameObject> CardObjects = new List<GameObject>();
-            for (int i = 0; i < 5; i++)
-            {
-                GameObject NewCard = Instantiate(CardPrefab);
-                CardScript AssociatedScript = NewCard.GetComponent<CardScript>();
-                AssociatedScript.CardIndex = i;
-                AssociatedScript.Hover = true;
-                AssociatedScript.GetComponent<UnityEngine.UI.Image>().sprite = m_Hand[i].GetComponent<UnityEngine.UI.Image>().sprite;
-                AssociatedScript.AssociatedHandler = this;
-                CardObjects.Add(NewCard);
-            }
-            m_OpponentPickHandler = new HandAnimation(CardObjects);
+            p_InitializeOpponentPick();
         }
     }
 }

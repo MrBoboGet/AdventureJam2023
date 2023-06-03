@@ -32,6 +32,7 @@ public class CardScript : MonoBehaviour,IDragHandler,IDropHandler,IPointerEnterH
 
     public void Drop()
     {
+        Destroy(gameObject);
         transform.localScale = new Vector3(0.5f, 0.5f, 0.5f);
         enabled = false;
     }
@@ -46,6 +47,10 @@ public class CardScript : MonoBehaviour,IDragHandler,IDropHandler,IPointerEnterH
     }
     public void OnDrop(PointerEventData eventData)
     {
+        if(Hover)
+        {
+            return;
+        }
         Camera GlobalCamera = FindObjectOfType<Camera>();
         RaycastHit2D TableHit = Physics2D.Raycast(
             GlobalCamera.ScreenToWorldPoint(eventData.position), GlobalCamera.transform.forward,Mathf.Infinity,1<<LayerMask.NameToLayer("Table"));
