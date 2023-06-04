@@ -9,6 +9,7 @@ TagManager:
   - PokerScene
   - OpponentPickScene
   - Hand
+  - BettingMenu
   layers:
   - Default
   - TransparentFX

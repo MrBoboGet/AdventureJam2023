@@ -9,24 +9,111 @@ public enum DropType
     Opponent
 }
 
+public class Move
+{
+
+}
+
+public class Move_StealCard : Move
+{
+
+}
+public class Move_DiscardCards : Move
+{
+    public List<Card> DiscardedCards = new List<Card>();
+}
+
+public class Move_Fold : Move
+{
+
+}
+public class Move_Raise : Move
+{
+
+}
+public class Move_Match : Move
+{
+
+}
+public class Move_Call : Move
+{
+
+}
+
+public class PokerState
+{
+    public int OpponentCash = 15;
+    public int PlayerCash = 15;
+    public int OpponentPot = 0;
+    public int PlayerPot = 0;
+    public bool PlayerTurn = true;
+    public bool Call = false;
+
+    public List<Card> PlayerHand = new List<Card>();
+    public List<Card> OpponentHand = new List<Card>();
+    public Deck AssociatedDeck;
+}
+
 [System.Serializable]
 public class NPCOpponent
 {
     public Sprite Neutral;
     public Sprite Tell;
-
     public Sprite PickHand;
     public Sprite HandGrab;
-
-
-    public List<Card> Hand = new List<Card>();
+    
+    public Move MakeMove(PokerState CurrentState)
+    {
+        Move ReturnValue = null;
+        if(CurrentState.Call)
+        {
+            float RandomXD = Random.Range(0, 1f);
+            if(RandomXD < 0.33f)
+            {
+                ReturnValue = new Move_Match();
+            }
+            else if(RandomXD < 0.66f)
+            {
+                ReturnValue = new Move_Raise();
+            }
+            else if(RandomXD < 1f)
+            {
+                ReturnValue = new Move_Fold();
+            }
+        }
+        else
+        {
+            float RandomXD = Random.Range(0, 1f);
+            if(RandomXD < 0.33f)
+            {
+                ReturnValue = new Move_StealCard();
+            }
+            else if(RandomXD < 0.66f)
+            {
+                ReturnValue = new Move_Call();
+            }
+            else if(RandomXD < 1)
+            {
+                ReturnValue = new Move_DiscardCards();
+                Move_DiscardCards CardsToDiscard = (Move_DiscardCards)ReturnValue;
+                Card CardToDiscard = CurrentState.OpponentHand[0];
+                CurrentState.OpponentHand[0] = CurrentState.AssociatedDeck.DrawCard();
+                CardsToDiscard.DiscardedCards.Add(CardToDiscard);
+            }
+        }
+        return (ReturnValue);
+    }
 }
+
+
 
 
 
 public class PokerHandler : MonoBehaviour
 {
     public GameObject CardObject;
+
+    GameObject m_BettingMenu;
     class HandAnimation
     {
         public void Initialize()
@@ -193,26 +280,20 @@ public class PokerHandler : MonoBehaviour
     public GameObject CardPrefab;
     public GameObject SelectCardScene;
     public GameObject OpponentSelectCardScene;
+    public GameObject RevealCardsScene;
+
     public NPCOpponent TempOpponent = new NPCOpponent();
 
     PickHandler m_PickHandler = null;
     HandAnimation m_OpponentPickHandler = null;
 
     Deck m_AssociatedDeck;
-    List<GameObject> m_Hand;
+    //List<GameObject> m_Hand;
+    List<GameObject> m_HandObjects;
 
     Canvas m_GlobalCanvas;
     GameObject m_SceneObject;
 
-    class PokerState
-    {
-        public int OpponentCash = 15;
-        public int PlayerCash = 15;
-        public int OpponentPot = 0;
-        public int PlayerPot = 0;
-        public bool PlayerTurn = true;
-        public bool Call = false;
-    }
     class OpponentTurnState
     {
         public float ThinkTime = 2f;
@@ -237,9 +318,81 @@ public class PokerHandler : MonoBehaviour
     {
 
     }
+    void p_StartBettingSequence()
+    {
+        m_CurrentPokerState.Call = true;
+        if(m_CurrentPokerState.PlayerTurn)
+        {
+            m_BettingMenu.SetActive(true);
+        }
+        else
+        {
+            m_BettingMenu.SetActive(false);
+        }
+    }
+    bool m_RevealSequence = false;
+    IEnumerator p_RevealSequence(List<GameObject> PlayerCards,List<GameObject> OpponentCards,PokerHandler AssociatedHandler,GameObject RevealScene)
+    {
+        AssociatedHandler.m_RevealSequence = true;
+        float TargetPosition = -100;
+        float RevealDelay = 1f;
+        float ElapsedTime = 0;
+        while(ElapsedTime < RevealDelay)
+        {
+            ElapsedTime += Time.deltaTime;
+            yield return null;
+        }
+        float RevealSpeed = 200f;
+        while( Mathf.Abs(PlayerCards[0].transform.localPosition.y - TargetPosition) >= 0.1f)
+        {
+            for(int i = 0; i < 5;i++)
+            {
+                float YSpeed = Mathf.Min(Mathf.Abs(PlayerCards[0].transform.localPosition.y - TargetPosition), RevealSpeed*Time.deltaTime);
+                PlayerCards[i].transform.localPosition += new Vector3(0, YSpeed);
+                OpponentCards[i].transform.localPosition += new Vector3(0,-YSpeed);
+            }
+            yield return null;
+        }
+        float WaitDelay = 1f;
+        ElapsedTime = 0;
+        while (ElapsedTime < WaitDelay)
+        {
+            ElapsedTime += Time.deltaTime;
+            yield return null;
+        }
+        AssociatedHandler.m_RevealSequence = false;
+        AssociatedHandler.p_InitializeNewRound();
+        AssociatedHandler.m_SceneObject.SetActive(true);
+        Destroy(RevealScene);
+    }
+
     void p_InitializeRevealSequence()
     {
+        GameObject RevealCardSceneObject = Instantiate(RevealCardsScene);
+        Canvas AssociatedCanvas = RevealCardSceneObject.GetComponentInChildren<Canvas>();
+        m_SceneObject.SetActive(false);
+        List<GameObject> PlayerCards = new List<GameObject>();
+        List<GameObject> OpponentCards = new List<GameObject>();
+        for(int i = 0; i < 5;i++)
+        {
+            GameObject PlayerCard = Instantiate(CardPrefab);
+            PlayerCard.transform.parent = AssociatedCanvas.transform;
+            PlayerCard.transform.localPosition = new Vector2(-400 + i * 200, -500);
+            CardScript AssociatedScript = PlayerCard.GetComponent<CardScript>();
+            AssociatedScript.CardValue = m_AssociatedDeck.DrawCard();
+            AssociatedScript.GetComponent<UnityEngine.UI.Image>().sprite = m_AssociatedDeck.GetSprite(m_CurrentPokerState.PlayerHand[i]);
 
+            GameObject OpponentCard = Instantiate(CardPrefab);
+            OpponentCard.transform.parent = AssociatedCanvas.transform;
+            OpponentCard.transform.localPosition = new Vector2(-400 + i * 200, 500);
+            AssociatedScript = OpponentCard.GetComponent<CardScript>();
+            AssociatedScript.CardValue = m_AssociatedDeck.DrawCard();
+            AssociatedScript.GetComponent<UnityEngine.UI.Image>().sprite = m_AssociatedDeck.GetSprite(m_CurrentPokerState.OpponentHand[i]);
+
+            PlayerCards.Add(PlayerCard);
+            OpponentCards.Add(OpponentCard);
+        }
+        StartCoroutine(p_RevealSequence(PlayerCards, OpponentCards, this, RevealCardSceneObject));
     }
     void p_InitializeDefeat()
     {
@@ -266,23 +419,27 @@ public class PokerHandler : MonoBehaviour
         AssociatedScript.CardValue = m_AssociatedDeck.DrawCard();
         AssociatedScript.AssociatedHandler = this;
         AssociatedScript.GetComponent<UnityEngine.UI.Image>().sprite = m_AssociatedDeck.GetSprite(AssociatedScript.CardValue);
-        m_Hand[CardIndex] = NewCard;
+        m_HandObjects[CardIndex] = NewCard;
+        m_CurrentPokerState.PlayerHand[CardIndex] = AssociatedScript.CardValue;
     }
     void Start()
     {
-        m_Hand = new List<GameObject>();
+        m_HandObjects = new List<GameObject>();
         for(int i = 0; i < 5;i++)
         {
-            m_Hand.Add(null);
+            m_HandObjects.Add(null);
+            m_CurrentPokerState.PlayerHand.Add(null);
         }
         m_SceneObject = GameObject.FindGameObjectWithTag("PokerScene");
         m_AssociatedDeck = FindObjectOfType<Deck>();
+        m_CurrentPokerState.AssociatedDeck = m_AssociatedDeck;
+        m_BettingMenu = GameObject.FindObjectOfType<RaiseMenu>(true).gameObject;
         m_GlobalCanvas = m_SceneObject.GetComponentInChildren<Canvas>();
         //create hand
         for(int i = 0; i < 5;i++)
         {
             DrawCard(i);
-            TempOpponent.Hand.Add(m_AssociatedDeck.DrawCard());
+            m_CurrentPokerState.OpponentHand.Add(m_AssociatedDeck.DrawCard());
         }
     }
     public void CardClicked(CardScript AssociatedCard)
@@ -375,12 +532,22 @@ public class PokerHandler : MonoBehaviour
         m_CurrentPokerState.PlayerTurn = false;
     }
 
+
+
+
+    void p_UpdatePot()
+    {
+        FindObjectOfType<FundDisplay>().SetOpponentFunds(m_CurrentPokerState.OpponentCash);
+        FindObjectOfType<FundDisplay>().SetPlayerFunds(m_CurrentPokerState.PlayerCash);
+    }
     public void OnRaise()
     {
         int NewTotalPot = m_CurrentPokerState.OpponentPot + 2;
         int TotalRaise = NewTotalPot - m_CurrentPokerState.PlayerPot;
         m_CurrentPokerState.PlayerPot += TotalRaise;
         m_CurrentPokerState.PlayerCash -= TotalRaise;
+        m_CurrentPokerState.PlayerTurn = false;
+        p_UpdatePot();
     }
     public void OnMatch()
     {
@@ -388,17 +555,23 @@ public class PokerHandler : MonoBehaviour
         int TotalRaise = NewTotalPot - m_CurrentPokerState.PlayerPot;
         m_CurrentPokerState.PlayerPot += TotalRaise;
         m_CurrentPokerState.PlayerCash -= TotalRaise;
+        m_CurrentPokerState.PlayerTurn = false;
+        p_UpdatePot();
+        p_InitializeRevealSequence();
+        //reveal sequence
     }
     public void OnFold()
     {
         m_CurrentPokerState.OpponentCash += m_CurrentPokerState.PlayerPot + m_CurrentPokerState.OpponentPot;
         m_CurrentPokerState.PlayerPot = 0;
         m_CurrentPokerState.OpponentPot = 0;
+        m_CurrentPokerState.PlayerTurn = false;
         p_InitializeNewRound();
+        p_UpdatePot();
     }
     public void OnCall()
     {
-
+        p_StartBettingSequence();
     }
 
     void p_InitializeOpponentPick()
@@ -415,7 +588,7 @@ public class PokerHandler : MonoBehaviour
             CardScript AssociatedScript = NewCard.GetComponent<CardScript>();
             AssociatedScript.CardIndex = i;
             AssociatedScript.Hover = true;
-            AssociatedScript.GetComponent<UnityEngine.UI.Image>().sprite = m_Hand[i].GetComponent<UnityEngine.UI.Image>().sprite;
+            AssociatedScript.GetComponent<UnityEngine.UI.Image>().sprite = m_HandObjects[i].GetComponent<UnityEngine.UI.Image>().sprite;
             AssociatedScript.AssociatedHandler = this;
             CardObjects.Add(NewCard);
         }
@@ -426,6 +599,10 @@ public class PokerHandler : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        if(m_RevealSequence)
+        {
+            return;
+        }
         if(m_PickHandler != null)
         {
             if(!m_Initialised)
@@ -436,11 +613,12 @@ public class PokerHandler : MonoBehaviour
             int CardIndex = m_PickHandler.Update();
             if(CardIndex != -1)
             {
-                Card PickedCard = TempOpponent.Hand[CardIndex];
-                TempOpponent.Hand[CardIndex] = m_AssociatedDeck.DrawCard();
-                CardScript PlayerCard = m_Hand[CardIndex].GetComponent<CardScript>();
+                Card PickedCard = m_CurrentPokerState.OpponentHand[CardIndex];
+                m_CurrentPokerState.OpponentHand[CardIndex] = m_AssociatedDeck.DrawCard();
+                CardScript PlayerCard = m_HandObjects[CardIndex].GetComponent<CardScript>();
                 PlayerCard.CardValue = PickedCard;
-                m_Hand[m_ReplacedCardIndex].GetComponent<UnityEngine.UI.Image>().sprite = m_AssociatedDeck.GetSprite(PlayerCard.CardValue);
+                m_CurrentPokerState.PlayerHand[m_ReplacedCardIndex] = PickedCard;
+                m_HandObjects[m_ReplacedCardIndex].GetComponent<UnityEngine.UI.Image>().sprite = m_AssociatedDeck.GetSprite(PlayerCard.CardValue);
 
                 m_SceneObject.SetActive(true);
 
@@ -472,16 +650,60 @@ public class PokerHandler : MonoBehaviour
                 if(m_CurrentOpponentState.ElapsedThink >= m_CurrentOpponentState.ThinkTime)
                 {
                     //make move
-                    if(Random.Range(0,2) < 1f)
+                    Move NewMove = TempOpponent.MakeMove(m_CurrentPokerState);
+                    m_CurrentPokerState.PlayerTurn = true;
+                    if (m_CurrentPokerState.Call)
                     {
-                        //take card
+                        if (NewMove is Move_Raise)
+                        {
+                            int NewTotalPot = m_CurrentPokerState.PlayerPot + 2;
+                            int TotalRaise = NewTotalPot - m_CurrentPokerState.OpponentPot;
+                            m_CurrentPokerState.OpponentPot += TotalRaise;
+                            m_CurrentPokerState.OpponentCash -= TotalRaise;
+                            m_BettingMenu.SetActive(true);
+                            p_UpdatePot();
+                        }
+                        else if (NewMove is Move_Match)
+                        {
+                            int NewTotalPot = m_CurrentPokerState.PlayerPot;
+                            int TotalRaise = NewTotalPot - m_CurrentPokerState.OpponentPot;
+                            m_CurrentPokerState.OpponentPot += TotalRaise;
+                            m_CurrentPokerState.OpponentCash -= TotalRaise;
+                            m_BettingMenu.SetActive(true);
+                            p_UpdatePot();
+                        }
+                        else if(NewMove is Move_Fold)
+                        {
+                            m_CurrentPokerState.PlayerCash += m_CurrentPokerState.PlayerPot + m_CurrentPokerState.OpponentPot;
+                            m_CurrentPokerState.PlayerPot = 0;
+                            m_CurrentPokerState.OpponentPot = 0;
+                            m_BettingMenu.SetActive(true);
+                            p_InitializeNewRound();
+                            p_UpdatePot();
+                        }
                     }
                     else
                     {
-                        //do nothing
-                        p_InitializeOpponentPick();
+                        if(NewMove is Move_Call)
+                        {
+                            p_StartBettingSequence();
+                        }
+                        else if(NewMove is Move_DiscardCards)
+                        {
+                            foreach(Card DiscardedCard in ((Move_DiscardCards)NewMove).DiscardedCards)
+                            {
+                                Vector2 Origin = new Vector2(0, 5);
+                                //random destination
+                                Vector2 Destination = new Vector2(Random.Range(-4f, 4f), Random.Range(3, -3));
+                                Sprite AssociatedSprite = m_CurrentPokerState.AssociatedDeck.GetSprite(DiscardedCard);
+                                StartCoroutine(p_ThrowCard(Origin, Destination, AssociatedSprite));
+                            }
+                        }
+                        else if(NewMove is Move_StealCard)
+                        {
+                            p_InitializeOpponentPick();
+                        }
                     }
-                    m_CurrentPokerState.PlayerTurn = true;
                 }
             }
             else

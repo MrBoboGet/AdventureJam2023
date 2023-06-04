@@ -7,13 +7,16 @@ public class RaiseMenu : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        
+        AssociatedHandler = FindObjectOfType<PokerHandler>();
     }
 
     // Update is called once per frame
     void Update()
     {
-        
+        if(AssociatedHandler == null)
+        {
+            AssociatedHandler = FindObjectOfType<PokerHandler>();
+        }
     }
 
     public PokerHandler AssociatedHandler = null;
