@@ -316,7 +316,7 @@ public class PokerHandler : MonoBehaviour
     }
     void p_InitializeNewRound()
     {
-
+        m_CurrentPokerState.Call = false;
     }
     void p_StartBettingSequence()
     {
@@ -692,9 +692,9 @@ public class PokerHandler : MonoBehaviour
                         {
                             foreach(Card DiscardedCard in ((Move_DiscardCards)NewMove).DiscardedCards)
                             {
-                                Vector2 Origin = new Vector2(0, 5);
+                                Vector2 Origin = new Vector2(0, 0);
                                 //random destination
-                                Vector2 Destination = new Vector2(Random.Range(-4f, 4f), Random.Range(3, -3));
+                                Vector2 Destination = new Vector2(Random.Range(-6.5f, 6.5f), Random.Range(-4, 0));
                                 Sprite AssociatedSprite = m_CurrentPokerState.AssociatedDeck.GetSprite(DiscardedCard);
                                 StartCoroutine(p_ThrowCard(Origin, Destination, AssociatedSprite));
                             }
