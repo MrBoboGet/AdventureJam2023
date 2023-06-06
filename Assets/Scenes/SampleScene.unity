@@ -207,7 +207,7 @@ Transform:
   - {fileID: 92679518}
   - {fileID: 1780667106}
   m_Father: {fileID: 0}
-  m_RootOrder: 5
+  m_RootOrder: 6
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &48059516
 GameObject:
@@ -406,7 +406,7 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 6
+  m_RootOrder: 7
   m_LocalEulerAnglesHint: {x: 60, y: 0, z: 1115.84}
 --- !u!1 &244598880
 GameObject:
@@ -490,7 +490,7 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 1412666765}
-  m_RootOrder: 7
+  m_RootOrder: 6
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &409672706
 GameObject:
@@ -574,7 +574,7 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 1412666765}
-  m_RootOrder: 8
+  m_RootOrder: 7
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &461436895
 GameObject:
@@ -1250,7 +1250,7 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 1412666765}
-  m_RootOrder: 5
+  m_RootOrder: 4
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1278982798
 GameObject:
@@ -1310,7 +1310,7 @@ SpriteRenderer:
   m_LightmapParameters: {fileID: 0}
   m_SortingLayerID: 0
   m_SortingLayer: 0
-  m_SortingOrder: -57
+  m_SortingOrder: -1
   m_Sprite: {fileID: -2413806693520163455, guid: 4576a5bceebecd646ac0ccb70f4f5b27, type: 3}
   m_Color: {r: 0.8113208, g: 0.38247767, b: 0.06505875, a: 1}
   m_FlipX: 0
@@ -1486,14 +1486,13 @@ Transform:
   - {fileID: 48059517}
   - {fileID: 588301577}
   - {fileID: 1278982800}
-  - {fileID: 1534460453}
   - {fileID: 1138259534}
   - {fileID: 1966724623}
   - {fileID: 244598882}
   - {fileID: 409672708}
   - {fileID: 1532750758}
   m_Father: {fileID: 0}
-  m_RootOrder: 4
+  m_RootOrder: 5
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1532750757
 GameObject:
@@ -1526,7 +1525,7 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 1412666765}
-  m_RootOrder: 9
+  m_RootOrder: 8
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!95 &1532750759
 Animator:
@@ -1611,6 +1610,7 @@ GameObject:
   - component: {fileID: 1534460453}
   - component: {fileID: 1534460452}
   - component: {fileID: 1534460454}
+  - component: {fileID: 1534460455}
   m_Layer: 7
   m_Name: Square
   m_TagString: Untagged
@@ -1658,8 +1658,8 @@ SpriteRenderer:
   m_LightmapParameters: {fileID: 0}
   m_SortingLayerID: 0
   m_SortingLayer: 0
-  m_SortingOrder: -78
-  m_Sprite: {fileID: 21300000, guid: eb7faa0b7871bb14181f5c69b19e89eb, type: 3}
+  m_SortingOrder: -10
+  m_Sprite: {fileID: 21300000, guid: ccc40a274c76b4e4da53bfa18f323fd8, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
@@ -1678,11 +1678,11 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1534460451}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -3.5270362, y: -0.23830914, z: -57.306293}
-  m_LocalScale: {x: 0.4409, y: 0.35305, z: 1}
+  m_LocalPosition: {x: -0.16296387, y: 2.2183092, z: 0}
+  m_LocalScale: {x: 0.2972799, y: 0.23804641, z: 0.6742569}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 1412666765}
+  m_Father: {fileID: 0}
   m_RootOrder: 4
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!61 &1534460454
@@ -1702,7 +1702,7 @@ BoxCollider2D:
   m_SpriteTilingProperty:
     border: {x: 0, y: 0, z: 0, w: 0}
     pivot: {x: 0.5, y: 0.5}
-    oldSize: {x: 11.91, y: 16.84}
+    oldSize: {x: 32, y: 25.265625}
     newSize: {x: 1, y: 1}
     adaptiveTilingThreshold: 0.5
     drawMode: 0
@@ -1711,6 +1711,23 @@ BoxCollider2D:
   serializedVersion: 2
   m_Size: {x: 11.91, y: 16.84}
   m_EdgeRadius: 0
+--- !u!114 &1534460455
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1534460451}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 24906312f542fb64bbe10434c8b3286c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  EyeRadius: 0.1
+  NeutralSprite: {fileID: 21300000, guid: ccc40a274c76b4e4da53bfa18f323fd8, type: 3}
+  WhiteEye: {fileID: 21300000, guid: 35023a817c0857a4b8bfd8a3a12ee445, type: 3}
+  EyeSprite: {fileID: 21300000, guid: 3aefef91c8cc7bf428c2d6629bb82c6a, type: 3}
+  TellSprite: {fileID: 21300000, guid: 1bf9194b4a279b145a0496304d547396, type: 3}
 --- !u!1 &1780667105
 GameObject:
   m_ObjectHideFlags: 0
@@ -1877,7 +1894,7 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 1412666765}
-  m_RootOrder: 6
+  m_RootOrder: 5
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1001 &625177021417826287
 PrefabInstance:

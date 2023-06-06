@@ -1,7 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-
+using System.Linq;
 
 public enum DropType
 {
@@ -61,7 +61,8 @@ public class NPCOpponent
     public Sprite Tell;
     public Sprite PickHand;
     public Sprite HandGrab;
-    
+
+
     public Move MakeMove(PokerState CurrentState)
     {
         Move ReturnValue = null;
@@ -133,18 +134,20 @@ public class PokerHandler : MonoBehaviour
                 m_CardPositions[i].GetComponent<RectTransform>().sizeDelta = new Vector2(175, m_CardPositions[i].GetComponent<RectTransform>().sizeDelta.y);
             }
         }
-        public HandAnimation(List<GameObject> CardPositions)
+        public HandAnimation(List<GameObject> CardPositions,OpponentScript Opponent)
         {
             m_CardPositions = CardPositions;
+            m_Opponent = Opponent;
         }
 
         GameObject AssociatedObject;
         List<GameObject> m_CardPositions;
+        OpponentScript m_Opponent;
         float m_HoverLength= 3;
         float m_HoverSpeed = 8f;
         float m_GrabDelay = 0.5f;
         float m_GrabSpeed = 30f;
-        float m_GrabYLocation = 1f;
+        float m_GrabYLocation = 3f;
         float m_ElapsedAnimation = 0;
         int m_CurrentCardTarget = 0;
 
@@ -162,7 +165,10 @@ public class PokerHandler : MonoBehaviour
             }
             Vector2 TargetDestination = m_CardPositions[m_CurrentCardTarget].transform.position;
             TargetDestination = FindObjectOfType<Camera>().ScreenToWorldPoint(TargetDestination);
-            if (m_ElapsedAnimation < m_HoverLength ||  Mathf.Abs(TargetDestination.x - AssociatedObject.transform.position.x) > 0.1f)
+
+            m_Opponent.SetEyeDirection( (Vector2)FindObjectOfType<Camera>().WorldToScreenPoint(AssociatedObject.transform.position + new Vector3(0, -2)) - new Vector2(Screen.width / 2, Screen.height / 2));
+
+            if (m_ElapsedAnimation < m_HoverLength ||  Mathf.Abs(TargetDestination.x - AssociatedObject.transform.position.x) > 0.01f)
             {
                 //only use X
                 float XDiff = TargetDestination.x - AssociatedObject.transform.position.x;
@@ -232,9 +238,7 @@ public class PokerHandler : MonoBehaviour
         {
             //get scene object
             GameObject CardScene = GameObject.FindGameObjectWithTag("PickScene");
-            m_OpponentObject = GameObject.FindGameObjectWithTag("Opponent");
             //set opponent sprite
-            m_OpponentObject.GetComponent<SpriteRenderer>().sprite = Opponent.Neutral;
             Canvas AssociatedCanvas = CardScene.GetComponentInChildren<Canvas>();
             foreach(GameObject Object in ObjectsToArrange)
             {
@@ -255,11 +259,11 @@ public class PokerHandler : MonoBehaviour
             }
             if(CardIndex == 2)
             {
-                m_OpponentObject.GetComponent<SpriteRenderer>().sprite = Opponent.Tell;
+                //m_OpponentObject.GetComponent<SpriteRenderer>().sprite = Opponent.Tell;
             }
             else
             {
-                m_OpponentObject.GetComponent<SpriteRenderer>().sprite = Opponent.Neutral;
+                //m_OpponentObject.GetComponent<SpriteRenderer>().sprite = Opponent.Neutral;
             }
         }
         public void HoverLeave(int CardIndex)
@@ -317,6 +321,7 @@ public class PokerHandler : MonoBehaviour
     void p_InitializeNewRound()
     {
         m_CurrentPokerState.Call = false;
+        p_UpdatePot();
     }
     void p_StartBettingSequence()
     {
@@ -330,6 +335,136 @@ public class PokerHandler : MonoBehaviour
             m_BettingMenu.SetActive(false);
         }
     }
+
+    enum PokerHand
+    {
+        Null,
+        Pair,
+        TwoPair,
+        Triss,
+        Straight,
+        Flush,
+        FullHouse,
+        FourOfAKind
+        
+    }
+    int PairCount(List<Card> Hand,int TargetCount)
+    {
+        int ReturnValue = 0;
+        List<int> CountMap = new List<int>();
+        for(int i = 0; i < 13;i++)
+        {
+            CountMap.Add(0);
+        }
+        foreach(Card CurrentCard in Hand)
+        {
+            CountMap[CurrentCard.Value - 1] += 1;
+        }
+        foreach(int Count in CountMap)
+        {
+            if(Count == TargetCount)
+            {
+                ReturnValue += 1;
+            }
+        }
+        return(ReturnValue);
+    }
+    bool HasPair(List<Card> Hand)
+    {
+        return (PairCount(Hand, 2) == 1);
+    }
+    bool HasTwoPair(List<Card> Hand)
+    {
+        return (PairCount(Hand, 2) == 2);
+    }
+    bool HasTriss(List<Card> Hand)
+    {
+        return (PairCount(Hand,3) == 1);
+    }
+    bool HasFlush(List<Card> Hand)
+    {
+        bool ReturnValue = true;
+        CardType TargetType = Hand[0].Type;
+        for(int i = 1; i < 5;i++)
+        {
+            if(Hand[i].Type != TargetType)
+            {
+                ReturnValue = false;
+                break;
+            }
+        }
+        return (ReturnValue);
+    }
+    bool HasFourOfAKind(List<Card> Hand)
+    {
+        return (PairCount(Hand, 4) == 1);
+    }
+    bool HasStraight(List<Card> Hand)
+    {
+        bool ReturnValue = true;
+        List<Card> HandCopy = new List<Card>(Hand);
+        HandCopy.Sort((lhs, rhs) => (lhs.Value != 1 ?  lhs.Value : 14).CompareTo( rhs.Value != 1 ? lhs.Value : 14) );
+        for(int i = 0; i < 4; i++)
+        {
+            if(HandCopy[i].Value != HandCopy[i+1].Value+1 && !(HandCopy[i].Value == 13 && HandCopy[i+1].Value == 14))
+            {
+                ReturnValue = false;
+                break;
+            }
+        }
+        return (ReturnValue);
+    }
+        
+    PokerHand GetHand(List<Card> Hand)
+    {
+        PokerHand ReturnValue = PokerHand.Null;
+        if(HasPair(Hand))
+        {
+            ReturnValue = PokerHand.Pair;
+        }
+        if(HasTwoPair(Hand))
+        {
+            ReturnValue = PokerHand.TwoPair;
+        }
+        if(HasTriss(Hand))
+        {
+            ReturnValue = PokerHand.Triss;
+        }
+        if(HasPair(Hand) && HasTriss(Hand))
+        {
+            ReturnValue = PokerHand.FullHouse;
+        }
+        if(HasFlush(Hand))
+        {
+            ReturnValue = PokerHand.Flush;
+        }
+        if(HasStraight(Hand))
+        {
+            ReturnValue = PokerHand.Straight;
+        }
+        if(HasFourOfAKind(Hand))
+        {
+            ReturnValue = PokerHand.FourOfAKind;
+        }
+        return (ReturnValue);
+    }
+
+
+    public bool Less(List<Card> FirstHand,List<Card> SecondHand)
+    {
+        int Result = 0;
+        PokerHand LeftHand = GetHand(FirstHand);
+        PokerHand RightHand = GetHand(SecondHand);
+        Result = LeftHand.CompareTo(RightHand);
+        if(Result == 0)
+        {
+            int MaxLeft = FirstHand.Max( (lhs) => lhs.Value != 1 ? lhs.Value : 14);
+            int MaxRight = SecondHand.Max( (lhs) => lhs.Value != 1 ? lhs.Value : 14);
+            return (MaxLeft < MaxRight);
+        }
+        return (Result == -1);
+    }
+
     bool m_RevealSequence = false;
     IEnumerator p_RevealSequence(List<GameObject> PlayerCards,List<GameObject> OpponentCards,PokerHandler AssociatedHandler,GameObject RevealScene)
     {
@@ -360,10 +495,21 @@ public class PokerHandler : MonoBehaviour
             ElapsedTime += Time.deltaTime;
             yield return null;
         }
+        //determine winner
+
+
         AssociatedHandler.m_RevealSequence = false;
-        AssociatedHandler.p_InitializeNewRound();
         AssociatedHandler.m_SceneObject.SetActive(true);
+        m_OpponentObject.gameObject.SetActive(true);
         Destroy(RevealScene);
+        if (Less(m_CurrentPokerState.PlayerHand, m_CurrentPokerState.OpponentHand))
+        {
+            AssociatedHandler.p_PlayerLostRound();
+        }
+        else
+        {
+            AssociatedHandler.p_PlayerWonRound();
+        }
     }
 
     void p_InitializeRevealSequence()
@@ -371,6 +517,7 @@ public class PokerHandler : MonoBehaviour
         GameObject RevealCardSceneObject = Instantiate(RevealCardsScene);
         Canvas AssociatedCanvas = RevealCardSceneObject.GetComponentInChildren<Canvas>();
         m_SceneObject.SetActive(false);
+        m_OpponentObject.gameObject.SetActive(false);
         List<GameObject> PlayerCards = new List<GameObject>();
         List<GameObject> OpponentCards = new List<GameObject>();
         for(int i = 0; i < 5;i++)
@@ -394,13 +541,19 @@ public class PokerHandler : MonoBehaviour
         }
         StartCoroutine(p_RevealSequence(PlayerCards, OpponentCards, this, RevealCardSceneObject));
     }
-    void p_InitializeDefeat()
+    void p_PlayerLostRound()
     {
-
+        m_CurrentPokerState.PlayerCash += m_CurrentPokerState.PlayerPot + m_CurrentPokerState.OpponentPot;
+        m_CurrentPokerState.PlayerPot = 0;
+        m_CurrentPokerState.OpponentPot = 0;
+        p_InitializeNewRound();
     }
-    void p_InitializeWin()
+    void p_PlayerWonRound()
     {
-
+        m_CurrentPokerState.OpponentCash += m_CurrentPokerState.PlayerPot + m_CurrentPokerState.OpponentPot;
+        m_CurrentPokerState.PlayerPot = 0;
+        m_CurrentPokerState.OpponentPot = 0;
+        p_InitializeNewRound();
     }
 
 
@@ -422,8 +575,10 @@ public class PokerHandler : MonoBehaviour
         m_HandObjects[CardIndex] = NewCard;
         m_CurrentPokerState.PlayerHand[CardIndex] = AssociatedScript.CardValue;
     }
+    private OpponentScript m_OpponentObject;
     void Start()
     {
+        m_OpponentObject = FindObjectOfType<OpponentScript>();
         m_HandObjects = new List<GameObject>();
         for(int i = 0; i < 5;i++)
         {
@@ -453,6 +608,7 @@ public class PokerHandler : MonoBehaviour
     {
         if(m_PickHandler != null)
         {
+            m_OpponentObject.HoverEnter(AssociatedCard.CardIndex);
             m_PickHandler.HoverEnter(AssociatedCard.CardIndex);
         }
     }
@@ -460,6 +616,7 @@ public class PokerHandler : MonoBehaviour
     {
         if (m_PickHandler != null)
         {
+            m_OpponentObject.HoverLeave();
             m_PickHandler.HoverLeave(AssociatedCard.CardIndex);
         }
     }
@@ -503,6 +660,7 @@ public class PokerHandler : MonoBehaviour
             //create cards
             m_SceneObject.SetActive(false);
             Instantiate(SelectCardScene);
+            p_SetZoomCamera();
             for(int i = 0; i < 5;i++)
             {
                 GameObject NewCard = Instantiate(CardPrefab);
@@ -573,7 +731,20 @@ public class PokerHandler : MonoBehaviour
     {
         p_StartBettingSequence();
     }
+    float m_ZoomCamera = 2;
+    float m_ZoomPosition = 3;
+    
 
+    void p_SetZoomCamera()
+    {
+        FindObjectOfType<Camera>().orthographicSize = 2;
+        FindObjectOfType<Camera>().transform.position = new Vector3(0,3,-10);
+    }
+    void p_SetNormalCamera()
+    {
+        FindObjectOfType<Camera>().orthographicSize = 5;
+        FindObjectOfType<Camera>().transform.position = new Vector3(0, 0,-10);
+    }
     void p_InitializeOpponentPick()
     {
         //AssociatedCard.ResetPosition();
@@ -581,6 +752,8 @@ public class PokerHandler : MonoBehaviour
         //create cards
         m_SceneObject.SetActive(false);
         Instantiate(OpponentSelectCardScene);
+        p_SetZoomCamera();
+        //camera settings
         List<GameObject> CardObjects = new List<GameObject>();
         for (int i = 0; i < 5; i++)
         {
@@ -592,9 +765,19 @@ public class PokerHandler : MonoBehaviour
             AssociatedScript.AssociatedHandler = this;
             CardObjects.Add(NewCard);
         }
-        m_OpponentPickHandler = new HandAnimation(CardObjects);
+        m_OpponentPickHandler = new HandAnimation(CardObjects,m_OpponentObject);
     }
 
+
+    void p_ResetOpponentEyes()
+    {
+        m_OpponentObject.SetEyeDirection(new Vector2(0, 0));
+    }
+    void p_SetOpponentEyesMouse()
+    {
+        Vector3 EyeCenter = new Vector3(Screen.width / 2, Screen.height / 2);
+        m_OpponentObject.SetEyeDirection(Input.mousePosition - EyeCenter);
+    }
     bool m_Initialised = false;
     // Update is called once per frame
     void Update()
@@ -605,7 +788,8 @@ public class PokerHandler : MonoBehaviour
         }
         if(m_PickHandler != null)
         {
-            if(!m_Initialised)
+            p_SetOpponentEyesMouse();
+            if (!m_Initialised)
             {
                 m_PickHandler.Initialize();
                 m_Initialised = true;
@@ -621,8 +805,9 @@ public class PokerHandler : MonoBehaviour
                 m_HandObjects[m_ReplacedCardIndex].GetComponent<UnityEngine.UI.Image>().sprite = m_AssociatedDeck.GetSprite(PlayerCard.CardValue);
 
                 m_SceneObject.SetActive(true);
-
+                p_SetNormalCamera();
                 Destroy(GameObject.FindGameObjectWithTag("PickScene"));
+                p_ResetOpponentEyes();
                 m_PickHandler = null;
             }
         }
@@ -638,8 +823,10 @@ public class PokerHandler : MonoBehaviour
             {
                 DrawCard(GrabbedCardIndex);
                 m_SceneObject.SetActive(true);
+                p_SetNormalCamera();
                 Destroy(GameObject.FindGameObjectWithTag("OpponentPickScene"));
                 m_OpponentPickHandler = null;
+                p_ResetOpponentEyes();
             }
         }
         else 
@@ -694,7 +881,7 @@ public class PokerHandler : MonoBehaviour
                             {
                                 Vector2 Origin = new Vector2(0, 0);
                                 //random destination
-                                Vector2 Destination = new Vector2(Random.Range(-6.5f, 6.5f), Random.Range(-4, 0));
+                                Vector2 Destination = new Vector2(Random.Range(-6.5f, 6.5f), Random.Range(-2, 0));
                                 Sprite AssociatedSprite = m_CurrentPokerState.AssociatedDeck.GetSprite(DiscardedCard);
                                 StartCoroutine(p_ThrowCard(Origin, Destination, AssociatedSprite));
                             }

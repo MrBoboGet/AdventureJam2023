@@ -6,10 +6,10 @@ using System.Text.RegularExpressions;
 
 public enum CardType
 {
-    Spade,
-    Diamond,
-    Club,
-    Heart,
+    Spade = 0,
+    Diamond = 1,
+    Club = 2,
+    Heart = 3,
     Null
 }
 
