@@ -1,0 +1,47 @@
+#WhateverTrenchcoat
+"Hmpf, I see straight through you."
+
+"Punk."
+
+"Don't think you can fool me."
+
+"I'll show you a thing or two."
+
+"Hmmmm..."
+
+"Try to keep up."
+
+"Feel free to surrender"
+
+"Watch and learn."
+
+"Hmpf..."
+
+"Heh. This is me going easy, you know?"
+
+#WinTrenchcoat
+"Pffft!! Too. Easy."
+
+"Bwahahahaha!! You really thought you could win with that hand!?"
+
+"Bwahahahaha!! A fool and his money part ways!"
+
+"Bwahahahaha!! T-the look on your face! I just can't!"
+
+"Pffft!! Like taking candy from a private investigator!"
+
+"Bwahahahaha!! E-excuse me, I just... Pffft!!" 
+
+#LoseTrenchcoat
+"N-not bad..."
+
+"B-beginner's luck, I'm sure..."
+
+"H-happens to the best of us..."
+
+"H-heh, hehehe..."
+
+"H-hmpf, nothing I can't handle..."
+
+"H-hmmm... Interesting..."
+
