@@ -168,7 +168,7 @@ public class PokerHandler : MonoBehaviour
 
             m_Opponent.SetEyeDirection( (Vector2)FindObjectOfType<Camera>().WorldToScreenPoint(AssociatedObject.transform.position + new Vector3(0, -2)) - new Vector2(Screen.width / 2, Screen.height / 2));
 
-            if (m_ElapsedAnimation < m_HoverLength ||  Mathf.Abs(TargetDestination.x - AssociatedObject.transform.position.x) > 0.01f)
+            if (m_ElapsedAnimation < m_HoverLength ||  Mathf.Abs(TargetDestination.x - AssociatedObject.transform.position.x) > 0.1f)
             {
                 //only use X
                 float XDiff = TargetDestination.x - AssociatedObject.transform.position.x;
@@ -358,6 +358,7 @@ public class PokerHandler : MonoBehaviour
         m_CurrentPokerState.Call = false;
         p_UpdatePot();
         m_PokerPaused = true;
+        m_CurrentPokerState.PlayerTurn = true;
         StartCoroutine(p_WaitForAnimation());
         m_BettingMenu.SetActive(false);
         //
@@ -775,6 +776,7 @@ public class PokerHandler : MonoBehaviour
     }
     public void OnCall()
     {
+        m_CurrentPokerState.PlayerTurn = false;
         p_StartBettingSequence();
         m_CurrentPokerState.PlayerCash -= 2;
         m_CurrentPokerState.PlayerPot += 2;

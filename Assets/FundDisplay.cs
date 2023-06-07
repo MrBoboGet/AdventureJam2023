@@ -5,7 +5,7 @@ using UnityEngine;
 public class FundDisplay : MonoBehaviour
 {
     // Start is called before the first frame update
-    void Start()
+    void Awake()
     {
         m_Displays = new List<TMPro.TextMeshProUGUI>(GetComponentsInChildren<TMPro.TextMeshProUGUI>());
     }

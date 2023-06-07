@@ -163,17 +163,17 @@ public class OpponentScript : MonoBehaviour
     public void OnWin()
     {
         StartCoroutine(p_ChangeSprite(WinSprite, ChangeDuration));
-        if(m_Dialog.ContainsKey("OnWin"))
+        if(m_Dialog.ContainsKey("Win"))
         {
-            p_DisplayDialog(m_Dialog["OnWin"]);
+            p_DisplayDialog(m_Dialog["Win"]);
         }
     }
     public void OnLose()
     {
         StartCoroutine(p_ChangeSprite(LoseSprite, ChangeDuration));
-        if (m_Dialog.ContainsKey("OnLose"))
+        if (m_Dialog.ContainsKey("Lose"))
         {
-            p_DisplayDialog(m_Dialog["OnLose"]);
+            p_DisplayDialog(m_Dialog["Lose"]);
         }
     }
     public void OnThink()
