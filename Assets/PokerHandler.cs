@@ -308,6 +308,8 @@ public class PokerHandler : MonoBehaviour
     PokerState m_CurrentPokerState = new PokerState();
     OpponentTurnState m_CurrentOpponentState = new OpponentTurnState();
 
+    bool m_PokerPaused = false;
+
     int m_DiscardedCard = 0;
     Vector2 GetPosition(int CardIndex)
     {
@@ -318,10 +320,47 @@ public class PokerHandler : MonoBehaviour
     {
         print("Oof");
     }
+
+    IEnumerator p_WaitForAnimation() 
+    {
+        int t = 0;
+        while(t < 5)
+        {
+            t += 1;
+            yield return null;
+        }
+        while(m_OpponentObject.InAnimation())
+        {
+            yield return null;
+        }
+        //destroy cards
+        GameObject[] Objects = GameObject.FindGameObjectsWithTag("Card");
+        foreach(GameObject Object in Objects)
+        {
+            Destroy(Object);
+        }
+        m_CurrentPokerState.AssociatedDeck.ResetDeck();
+        for(int i = 0; i < 5;i++)
+        {
+            DrawCard(i);
+            m_CurrentPokerState.OpponentHand[i] = m_CurrentPokerState.AssociatedDeck.DrawCard(); 
+        }
+        m_PokerPaused = false;
+    }
     void p_InitializeNewRound()
     {
+        m_CurrentPokerState.PlayerPot = 2;
+        m_CurrentPokerState.OpponentPot = 2;
+        m_CurrentPokerState.PlayerCash -= 2;
+        m_CurrentPokerState.OpponentCash -= 2;
+
+
         m_CurrentPokerState.Call = false;
         p_UpdatePot();
+        m_PokerPaused = true;
+        StartCoroutine(p_WaitForAnimation());
+        m_BettingMenu.SetActive(false);
+        //
     }
     void p_StartBettingSequence()
     {
@@ -403,7 +442,7 @@ public class PokerHandler : MonoBehaviour
     {
         bool ReturnValue = true;
         List<Card> HandCopy = new List<Card>(Hand);
-        HandCopy.Sort((lhs, rhs) => (lhs.Value != 1 ?  lhs.Value : 14).CompareTo( rhs.Value != 1 ? lhs.Value : 14) );
+        HandCopy.Sort((lhs, rhs) => (lhs.Value != 1 ?  lhs.Value : 14).CompareTo( rhs.Value != 1 ? rhs.Value : 14) );
         for(int i = 0; i < 4; i++)
         {
             if(HandCopy[i].Value != HandCopy[i+1].Value+1 && !(HandCopy[i].Value == 13 && HandCopy[i+1].Value == 14))
@@ -505,9 +544,11 @@ public class PokerHandler : MonoBehaviour
         if (Less(m_CurrentPokerState.PlayerHand, m_CurrentPokerState.OpponentHand))
         {
             AssociatedHandler.p_PlayerLostRound();
+            m_OpponentObject.OnWin();
         }
         else
         {
+            m_OpponentObject.OnLose();
             AssociatedHandler.p_PlayerWonRound();
         }
     }
@@ -543,14 +584,14 @@ public class PokerHandler : MonoBehaviour
     }
     void p_PlayerLostRound()
     {
-        m_CurrentPokerState.PlayerCash += m_CurrentPokerState.PlayerPot + m_CurrentPokerState.OpponentPot;
+        m_CurrentPokerState.OpponentCash += m_CurrentPokerState.PlayerPot + m_CurrentPokerState.OpponentPot;
         m_CurrentPokerState.PlayerPot = 0;
         m_CurrentPokerState.OpponentPot = 0;
         p_InitializeNewRound();
     }
     void p_PlayerWonRound()
     {
-        m_CurrentPokerState.OpponentCash += m_CurrentPokerState.PlayerPot + m_CurrentPokerState.OpponentPot;
+        m_CurrentPokerState.PlayerCash += m_CurrentPokerState.PlayerPot + m_CurrentPokerState.OpponentPot;
         m_CurrentPokerState.PlayerPot = 0;
         m_CurrentPokerState.OpponentPot = 0;
         p_InitializeNewRound();
@@ -572,6 +613,10 @@ public class PokerHandler : MonoBehaviour
         AssociatedScript.CardValue = m_AssociatedDeck.DrawCard();
         AssociatedScript.AssociatedHandler = this;
         AssociatedScript.GetComponent<UnityEngine.UI.Image>().sprite = m_AssociatedDeck.GetSprite(AssociatedScript.CardValue);
+        if(m_HandObjects[CardIndex] != null)
+        {
+            Destroy(m_HandObjects[CardIndex]);
+        }
         m_HandObjects[CardIndex] = NewCard;
         m_CurrentPokerState.PlayerHand[CardIndex] = AssociatedScript.CardValue;
     }
@@ -596,6 +641,7 @@ public class PokerHandler : MonoBehaviour
             DrawCard(i);
             m_CurrentPokerState.OpponentHand.Add(m_AssociatedDeck.DrawCard());
         }
+        p_InitializeNewRound();
     }
     public void CardClicked(CardScript AssociatedCard)
     {
@@ -643,7 +689,7 @@ public class PokerHandler : MonoBehaviour
     int m_ReplacedCardIndex = 0;
     public void CardDropped(CardScript AssociatedCard,DropType Type)
     {
-        if(!m_CurrentPokerState.PlayerTurn || m_CurrentPokerState.Call)
+        if(!m_CurrentPokerState.PlayerTurn || m_CurrentPokerState.Call || m_PokerPaused)
         {
             AssociatedCard.ResetPosition();
             Oof();
@@ -730,6 +776,8 @@ public class PokerHandler : MonoBehaviour
     public void OnCall()
     {
         p_StartBettingSequence();
+        m_CurrentPokerState.PlayerCash -= 2;
+        m_CurrentPokerState.PlayerPot += 2;
     }
     float m_ZoomCamera = 2;
     float m_ZoomPosition = 3;
@@ -782,7 +830,7 @@ public class PokerHandler : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if(m_RevealSequence)
+        if(m_RevealSequence || m_PokerPaused)
         {
             return;
         }

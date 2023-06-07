@@ -1659,7 +1659,7 @@ SpriteRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: -10
-  m_Sprite: {fileID: 21300000, guid: ccc40a274c76b4e4da53bfa18f323fd8, type: 3}
+  m_Sprite: {fileID: 21300000, guid: c325b326da371c141b8bb01e8d274ada, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
@@ -1702,7 +1702,7 @@ BoxCollider2D:
   m_SpriteTilingProperty:
     border: {x: 0, y: 0, z: 0, w: 0}
     pivot: {x: 0.5, y: 0.5}
-    oldSize: {x: 32, y: 25.265625}
+    oldSize: {x: 25.000988, y: 25.26}
     newSize: {x: 1, y: 1}
     adaptiveTilingThreshold: 0.5
     drawMode: 0
@@ -1723,11 +1723,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 24906312f542fb64bbe10434c8b3286c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  EyeRadius: 0.1
-  NeutralSprite: {fileID: 21300000, guid: ccc40a274c76b4e4da53bfa18f323fd8, type: 3}
-  WhiteEye: {fileID: 21300000, guid: 35023a817c0857a4b8bfd8a3a12ee445, type: 3}
-  EyeSprite: {fileID: 21300000, guid: 3aefef91c8cc7bf428c2d6629bb82c6a, type: 3}
-  TellSprite: {fileID: 21300000, guid: 1bf9194b4a279b145a0496304d547396, type: 3}
+  EyeRadius: 0.13
+  NeutralSprite: {fileID: 21300000, guid: c325b326da371c141b8bb01e8d274ada, type: 3}
+  WhiteEye: {fileID: 21300000, guid: b25646dabe23f4d4481fb6b3af4e0688, type: 3}
+  EyeSprite: {fileID: 21300000, guid: f055ded2fc6fb5849b241f635cda03f2, type: 3}
+  TellSprite: {fileID: 21300000, guid: deebfcfed3926e440b649b7838477310, type: 3}
 --- !u!1 &1780667105
 GameObject:
   m_ObjectHideFlags: 0
