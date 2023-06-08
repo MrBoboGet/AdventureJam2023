@@ -42,8 +42,8 @@ public class OpponentScript : MonoBehaviour
     {
         m_AssociatedCanvas = FindObjectOfType<Canvas>();
 
-
         m_DialogObject = Instantiate(DialogObject);
+        m_DialogObject.SetActive(false);
         Vector3 OriginalPosition = m_DialogObject.transform.position;
         m_DialogObject.transform.parent = m_AssociatedCanvas.gameObject.transform;
         m_DialogObject.transform.position = new Vector3();
@@ -174,7 +174,11 @@ public class OpponentScript : MonoBehaviour
         string DialogToDisplay = PossibleDialogs[Random.Range(0, PossibleDialogs.Count)];
         StartCoroutine(p_DisplayDialog(DialogToDisplay));
     }
-
+    List<IEnumerator> m_CoRoutines = new List<IEnumerator>();
+    void StartCoroutine(IEnumerator NewRoutine)
+    {
+        m_CoRoutines.Add(NewRoutine);
+    }
     public void OnWin()
     {
         StartCoroutine(p_ChangeSprite(WinSprite, ChangeDuration));
@@ -252,6 +256,15 @@ public class OpponentScript : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        
+        List<IEnumerator> NewRoutines = new List<IEnumerator>();
+        foreach(IEnumerator Routine in m_CoRoutines)
+        {
+            if (Routine.MoveNext())
+            {
+                //remove 
+                NewRoutines.Add(Routine);
+            }
+        }
+        m_CoRoutines = NewRoutines;
     }
 }
