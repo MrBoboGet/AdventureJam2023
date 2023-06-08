@@ -1,7 +1,7 @@
 #Whatever
 "Hmpf, I see straight through you."
 
-"Punk."
+"I used to be an investigator too, you know."
 
 "Don't think you can fool me."
 
@@ -60,11 +60,11 @@
 
 
 #OpponentRaise
-"You don't seem to fond of your money"
+"Not too fond of your money, are you?"
 
 #OpponentCall
 
-"dasjkljakldsjklasd"
+"Oh, you're approaching me?"
 
 #OpponentFold
-"Can't handle the pressure huh"
+"Couldn't handle the pressure huh?"
