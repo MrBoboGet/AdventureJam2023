@@ -622,8 +622,10 @@ public class PokerHandler : MonoBehaviour
         m_CurrentPokerState.PlayerHand[CardIndex] = AssociatedScript.CardValue;
     }
     private OpponentScript m_OpponentObject;
+    TimerScript m_Timer;
     void Start()
     {
+        m_Timer = FindObjectOfType<TimerScript>();
         m_OpponentObject = FindObjectOfType<OpponentScript>();
         m_HandObjects = new List<GameObject>();
         for(int i = 0; i < 5;i++)
@@ -688,6 +690,13 @@ public class PokerHandler : MonoBehaviour
         }
     }
     int m_ReplacedCardIndex = 0;
+
+
+    void p_DiscardCard(int CardIndex,Vector2 TargetPosition)
+    {
+
+    }
+
     public void CardDropped(CardScript AssociatedCard,DropType Type)
     {
         if(!m_CurrentPokerState.PlayerTurn || m_CurrentPokerState.Call || m_PokerPaused)
@@ -832,9 +841,42 @@ public class PokerHandler : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        
         if(m_RevealSequence || m_PokerPaused)
         {
+            m_Timer.gameObject.SetActive(false);
             return;
+        }
+        if(m_CurrentPokerState.PlayerTurn)
+        {
+            if(!m_Timer.isActiveAndEnabled)
+            {
+                m_Timer.ResetTimer();
+            }
+            m_Timer.gameObject.SetActive(true);
+            if(m_Timer.TimerUp())
+            {
+                if(m_CurrentPokerState.Call)
+                {
+                    OnFold();
+                }
+                else
+                {
+                    //discard random card
+                    int CardToDiscard = Random.Range(0, m_HandObjects.Count);
+                    //random target location
+                    Vector2 Origin = new Vector2(0, -5);
+                    Vector2 Destination = new Vector2(Random.Range(-6.5f, 6.5f), Random.Range(-4, -2));
+                    Sprite CardSprite = m_HandObjects[CardToDiscard].GetComponent<UnityEngine.UI.Image>().sprite;
+                    StartCoroutine(p_ThrowCard(Origin, Destination, CardSprite));
+                    DrawCard(CardToDiscard);
+                    m_CurrentPokerState.PlayerTurn = false;
+                }
+            }
+        }
+        else
+        {
+            m_Timer.gameObject.SetActive(false);
         }
         if(m_PickHandler != null)
         {
