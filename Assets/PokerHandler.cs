@@ -323,6 +323,7 @@ public class PokerHandler : MonoBehaviour
     public GameObject SelectCardScene;
     public GameObject OpponentSelectCardScene;
     public GameObject RevealCardsScene;
+    public AudioClip OofSound;
 
     public NPCOpponent TempOpponent = new NPCOpponent();
 
@@ -354,8 +355,11 @@ public class PokerHandler : MonoBehaviour
         return (new Vector2(-400 + CardIndex*200, -350));
     }
 
+    
     void Oof()
     {
+        m_StressObject.IncreaseStress();
+        AudioSource.PlayClipAtPoint(OofSound, new Vector3());
         print("Oof");
     }
 
@@ -661,8 +665,10 @@ public class PokerHandler : MonoBehaviour
     }
     private OpponentScript m_OpponentObject;
     TimerScript m_Timer;
+    Stress m_StressObject;
     void Start()
     {
+        m_StressObject = FindObjectOfType<Stress>();
         m_Timer = FindObjectOfType<TimerScript>();
         m_OpponentObject = FindObjectOfType<OpponentScript>();
         m_HandObjects = new List<GameObject>();
