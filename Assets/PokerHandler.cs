@@ -16,7 +16,7 @@ public class Move
 
 public class Move_StealCard : Move
 {
-
+    int DiscardedCardIndex = 0;
 }
 public class Move_DiscardCards : Move
 {
@@ -48,6 +48,7 @@ public class PokerState
     public int PlayerPot = 0;
     public bool PlayerTurn = true;
     public bool Call = false;
+    public int TurnCount = 0;
 
     public List<Card> PlayerHand = new List<Card>();
     public List<Card> OpponentHand = new List<Card>();
@@ -61,49 +62,6 @@ public class NPCOpponent
     public Sprite Tell;
     public Sprite PickHand;
     public Sprite HandGrab;
-
-
-    public Move MakeMove(PokerState CurrentState)
-    {
-        Move ReturnValue = null;
-        if(CurrentState.Call)
-        {
-            float RandomXD = Random.Range(0, 1f);
-            if(RandomXD < 0.33f)
-            {
-                ReturnValue = new Move_Match();
-            }
-            else if(RandomXD < 0.66f)
-            {
-                ReturnValue = new Move_Raise();
-            }
-            else if(RandomXD < 1f)
-            {
-                ReturnValue = new Move_Fold();
-            }
-        }
-        else
-        {
-            float RandomXD = Random.Range(0, 1f);
-            if(RandomXD < 0.33f)
-            {
-                ReturnValue = new Move_StealCard();
-            }
-            else if(RandomXD < 0.66f)
-            {
-                ReturnValue = new Move_Call();
-            }
-            else if(RandomXD < 1)
-            {
-                ReturnValue = new Move_DiscardCards();
-                Move_DiscardCards CardsToDiscard = (Move_DiscardCards)ReturnValue;
-                Card CardToDiscard = CurrentState.OpponentHand[0];
-                CurrentState.OpponentHand[0] = CurrentState.AssociatedDeck.DrawCard();
-                CardsToDiscard.DiscardedCards.Add(CardToDiscard);
-            }
-        }
-        return (ReturnValue);
-    }
 }
 
 
@@ -116,138 +74,6 @@ public class PokerHandler : MonoBehaviour
 
     RaiseMenu m_BettingMenu;
 
-    class HandAnimation
-    {
-        Camera m_Camera;
-        public void Initialize()
-        {
-            m_EventSystem = FindObjectOfType<EventSystem>();
-            m_Camera = FindObjectOfType<Camera>();
-            //get scene object
-            GameObject CardScene = GameObject.FindGameObjectWithTag("OpponentPickScene");
-            AssociatedObject = GameObject.FindGameObjectWithTag("Hand");
-            //set opponent sprite
-            Canvas AssociatedCanvas = CardScene.GetComponentInChildren<Canvas>();
-            foreach (GameObject Object in m_CardPositions)
-            {
-                Object.transform.parent = AssociatedCanvas.gameObject.transform;
-            }
-            for (int i = 0; i < m_CardPositions.Count; i++)
-            {
-                m_CardPositions[i].transform.localPosition = new Vector2(-400 + i * 200, -260);
-                m_CardPositions[i].GetComponent<RectTransform>().sizeDelta = new Vector2(175, m_CardPositions[i].GetComponent<RectTransform>().sizeDelta.y);
-            }
-        }
-        public HandAnimation(List<GameObject> CardPositions,OpponentScript Opponent)
-        {
-            m_CardPositions = CardPositions;
-            m_Opponent = Opponent;
-        }
-
-        GameObject AssociatedObject;
-        List<GameObject> m_CardPositions;
-        OpponentScript m_Opponent;
-
-        //event system
-        EventSystem m_EventSystem;
-
-        float m_HoverLength= 3;
-        float m_HoverSpeed = 8f;
-        float m_GrabDelay = 0.5f;
-        float m_GrabSpeed = 30f;
-        float m_GrabYLocation = 3f;
-        float m_ElapsedAnimation = 0;
-        int m_CurrentCardTarget = 0;
-
-        float m_ElapsedGrabTime= 0;
-
-        int m_GrabbedCardIndex = -1;
-
-        float m_GrabbTransitionDelay = 1f;
-        float m_ElapsedGrabTransition = 0;
-
-        int p_GetGrabbedCardIndex()
-        {
-            int ReturnValue = -1;
-            Vector3 FingerTipPosition = AssociatedObject.transform.position - 
-                new Vector3(0,(AssociatedObject.GetComponent<BoxCollider2D>().size.y/2)*AssociatedObject.transform.localScale.y);
-            FingerTipPosition = m_Camera.WorldToScreenPoint(FingerTipPosition);
-
-            PointerEventData EventData = new PointerEventData(m_EventSystem);
-            EventData.position = FingerTipPosition;
-
-            List<RaycastResult> Results = new List<RaycastResult>();
-            m_EventSystem.RaycastAll(EventData, Results);
-            if(Results.Count > 0)
-            {
-                foreach(RaycastResult Result in Results)
-                {
-                    CardScript ScriptComponent = Result.gameObject.GetComponent<CardScript>();
-                    if(ScriptComponent != null)
-                    {
-                        ReturnValue = ScriptComponent.CardIndex;
-                        break;
-                    }
-                }
-            }
-
-            return (ReturnValue);
-        }
-        public int Update()
-        {
-            if (AssociatedObject == null)
-            {
-                return (-1);
-            }
-            Vector2 TargetDestination = m_CardPositions[m_CurrentCardTarget].transform.position;
-            TargetDestination = m_Camera.ScreenToWorldPoint(TargetDestination);
-
-            m_Opponent.SetEyeDirection( (Vector2)m_Camera.WorldToScreenPoint(AssociatedObject.transform.position + new Vector3(0, -2)) - new Vector2(Screen.width / 2, Screen.height / 2));
-
-            if (m_ElapsedAnimation < m_HoverLength ||  Mathf.Abs(TargetDestination.x - AssociatedObject.transform.position.x) > 0.1f)
-            {
-                //only use X
-                float XDiff = TargetDestination.x - AssociatedObject.transform.position.x;
-
-                float XToAdd = Mathf.Min(Mathf.Abs(XDiff), m_HoverSpeed*Time.deltaTime) * Mathf.Sign(XDiff);
-                AssociatedObject.transform.position += new Vector3(XToAdd, 0);
-                if (Mathf.Abs(XToAdd) != m_HoverSpeed * Time.deltaTime)
-                {
-                    int CurrentTarget = m_CurrentCardTarget;
-                    while (CurrentTarget == m_CurrentCardTarget)
-                    {
-                        m_CurrentCardTarget = (int)Random.Range(0.0f, 4.999f);
-                    }
-                }
-                m_ElapsedAnimation += Time.deltaTime;
-            }
-            else
-            {
-                m_ElapsedGrabTime += Time.deltaTime;
-                if (m_ElapsedGrabTime > m_GrabDelay)
-                {
-                    if (Mathf.Abs(AssociatedObject.transform.position.y - m_GrabYLocation) < 0.1f)
-                    {
-                        m_ElapsedGrabTransition += Time.deltaTime;
-                        if (m_ElapsedGrabTransition > m_GrabbTransitionDelay)
-                        {
-                            //determine grabbed card
-                            //m_GrabbedCardIndex = 1;
-                            m_GrabbedCardIndex = p_GetGrabbedCardIndex();
-                        }
-                    }
-                    else
-                    {
-                        float YDiff = m_GrabYLocation - AssociatedObject.transform.position.y;
-                        float YDiffToAdd = Mathf.Min(m_GrabSpeed * Time.deltaTime, Mathf.Abs(YDiff)) * Mathf.Sign(YDiff);
-                        AssociatedObject.transform.position += new Vector3(0, YDiffToAdd);
-                    }
-                }
-            }
-            return (m_GrabbedCardIndex);
-        }
-
-    }
     class PickHandler
     {
         public List<GameObject> ObjectsToArrange = new List<GameObject>();
@@ -328,7 +154,7 @@ public class PokerHandler : MonoBehaviour
     public NPCOpponent TempOpponent = new NPCOpponent();
 
     PickHandler m_PickHandler = null;
-    HandAnimation m_OpponentPickHandler = null;
+    OpponentScript.HandAnimation m_OpponentPickHandler = null;
 
     Deck m_AssociatedDeck;
     //List<GameObject> m_Hand;
@@ -353,7 +179,7 @@ public class PokerHandler : MonoBehaviour
     Vector2 GetPosition(int CardIndex)
     {
         //return (new Vector2(-400 + CardIndex*200, -350));
-        return (new Vector2(-240 + CardIndex*120, -350));
+        return (new Vector2(-500 + CardIndex*250, -575));
     }
 
     
@@ -657,6 +483,7 @@ public class PokerHandler : MonoBehaviour
         AssociatedScript.CardValue = m_AssociatedDeck.DrawCard();
         AssociatedScript.AssociatedHandler = this;
         AssociatedScript.GetComponent<UnityEngine.UI.Image>().sprite = m_AssociatedDeck.GetSprite(AssociatedScript.CardValue);
+        //AssociatedScript.transform.SetParent(m_GlobalCanvas.transform, true);
         if(m_HandObjects[CardIndex] != null)
         {
             Destroy(m_HandObjects[CardIndex]);
@@ -754,6 +581,7 @@ public class PokerHandler : MonoBehaviour
         {
             //AssociatedCard.ResetPosition();
             //print("Opponent");
+            AssociatedCard.ResetPosition();
             m_ReplacedCardIndex = AssociatedCard.CardIndex;
             m_PickHandler = new PickHandler();
             m_PickHandler.PlayerPicking = true;
@@ -774,7 +602,6 @@ public class PokerHandler : MonoBehaviour
                 //AssociatedScript.gameObject.transform.parent = m_GlobalCanvas.gameObject.transform;
             }
             m_PickHandler.Initialize();
-            AssociatedCard.ResetPosition();
         }
         else if(Type == DropType.Table)
         {
@@ -788,6 +615,7 @@ public class PokerHandler : MonoBehaviour
             //replace card
             DrawCard(AssociatedCard.CardIndex);
         }
+        m_CurrentPokerState.TurnCount += 1;
         m_CurrentPokerState.PlayerTurn = false;
     }
 
@@ -834,6 +662,11 @@ public class PokerHandler : MonoBehaviour
     }
     public void OnCall()
     {
+        if(m_CurrentPokerState.TurnCount < 4)
+        {
+            Oof();
+            return;
+        }
         m_CurrentPokerState.PlayerTurn = false;
         p_StartBettingSequence();
         m_OpponentObject.OnOpponentCall();
@@ -874,7 +707,7 @@ public class PokerHandler : MonoBehaviour
             AssociatedScript.AssociatedHandler = this;
             CardObjects.Add(NewCard);
         }
-        m_OpponentPickHandler = new HandAnimation(CardObjects,m_OpponentObject);
+        m_OpponentPickHandler = m_OpponentObject.GetHandAnimation(CardObjects,m_OpponentObject);
     }
 
 
@@ -889,6 +722,22 @@ public class PokerHandler : MonoBehaviour
     }
     bool m_Initialised = false;
     // Update is called once per frame
+    
+    
+    IEnumerator DelayEnumerator(System.Action Callable, float Duration)
+    {
+        float ElapsedTime = 0;
+        while (ElapsedTime < Duration)
+        {
+            ElapsedTime += Time.deltaTime;
+            yield return null;
+        }
+        Callable();
+    }
+    void Delay(System.Action Callable,float Duration)
+    {
+        StartCoroutine(DelayEnumerator(Callable, Duration));
+    }
     void Update()
     {
         
@@ -963,23 +812,37 @@ public class PokerHandler : MonoBehaviour
             int GrabbedCardIndex = m_OpponentPickHandler.Update();
             if(GrabbedCardIndex != -1)
             {
-                DrawCard(GrabbedCardIndex);
                 m_SceneObject.SetActive(true);
                 p_SetNormalCamera();
                 Destroy(GameObject.FindGameObjectWithTag("OpponentPickScene"));
                 m_OpponentPickHandler = null;
                 p_ResetOpponentEyes();
+                DrawCard(GrabbedCardIndex);
             }
         }
         else 
         {
             if(!m_CurrentPokerState.PlayerTurn)
             {
+                if(m_CurrentOpponentState.ElapsedThink == 0)
+                {
+                    //random how long think
+                    if(Random.Range(0f,1f) < 0.4f)
+                    {
+                        //m_OpponentObject.OnThink();
+                        Delay(() => m_OpponentObject.OnThink(), 1);
+                        m_CurrentOpponentState.ThinkTime = 4f;
+                    }
+                    else
+                    {
+                        m_CurrentOpponentState.ThinkTime = 2;
+                    }
+                }
                 m_CurrentOpponentState.ElapsedThink += Time.deltaTime;
                 if(m_CurrentOpponentState.ElapsedThink >= m_CurrentOpponentState.ThinkTime)
                 {
                     //make move
-                    Move NewMove = TempOpponent.MakeMove(m_CurrentPokerState);
+                    Move NewMove = m_OpponentObject.MakeMove(m_CurrentPokerState);
                     m_CurrentPokerState.PlayerTurn = true;
                     if (m_CurrentPokerState.Call)
                     {
