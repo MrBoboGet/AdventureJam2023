@@ -1,7 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-
+using UnityEngine.EventSystems;
 public class OpponentScript : MonoBehaviour
 {
     public float EyeRadius = 0.1f;
@@ -125,6 +125,16 @@ public class OpponentScript : MonoBehaviour
             GetComponent<SpriteRenderer>().sprite = TellSprite;
         }
     }
+
+
+    public void OnThink()
+    {
+        if (m_Dialog.ContainsKey("Whatever"))
+        {
+            p_DisplayDialog(m_Dialog["Whatever"],2);
+        }
+    }
+
     public void HoverLeave()
     {
         GetComponent<SpriteRenderer>().sprite = NeutralSprite;
@@ -145,34 +155,49 @@ public class OpponentScript : MonoBehaviour
         m_InAnimation = false;
     }
     int m_DialogCount = 0;
-    IEnumerator p_DisplayDialog(string DialogString)
+
+
+    IEnumerator p_DisplayDialog(string DialogString,float Duration)
     {
         m_DialogCount += 1;
         m_DialogObject.SetActive(true);
         m_DialogObject.GetComponentInChildren<TMPro.TextMeshProUGUI>().text = DialogString;
 
-        float DialogDuration = ChangeDuration;
+        float DialogDuration = Duration;
         float ElapsedTime = 0;
-        while(ElapsedTime < DialogDuration)
+        while (ElapsedTime < DialogDuration)
         {
             ElapsedTime += Time.deltaTime;
             yield return null;
         }
         m_DialogCount -= 1;
-        if(m_DialogCount == 0)
+        if (m_DialogCount == 0)
         {
             m_DialogObject.SetActive(false);
         }
+    }
+    IEnumerator p_DisplayDialog(string DialogString)
+    {
+        return (p_DisplayDialog(DialogString, ChangeDuration));
         //Destroy(IngameDialogObject);
     }
-    void p_DisplayDialog(List<string> PossibleDialogs)
+    void p_DisplayDialog(List<string> PossibleDialogs,float DialougeDuration)
     {
         if(PossibleDialogs == null)
         {
             return;
         }
         string DialogToDisplay = PossibleDialogs[Random.Range(0, PossibleDialogs.Count)];
-        StartCoroutine(p_DisplayDialog(DialogToDisplay));
+        StartCoroutine(p_DisplayDialog(DialogToDisplay,DialougeDuration));
+    }
+    void p_DisplayDialog(List<string> PossibleDialogs)
+    {
+        if (PossibleDialogs == null)
+        {
+            return;
+        }
+        string DialogToDisplay = PossibleDialogs[Random.Range(0, PossibleDialogs.Count)];
+        StartCoroutine(p_DisplayDialog(DialogToDisplay,ChangeDuration));
     }
     List<IEnumerator> m_CoRoutines = new List<IEnumerator>();
     void StartCoroutine(IEnumerator NewRoutine)
@@ -195,10 +220,7 @@ public class OpponentScript : MonoBehaviour
             p_DisplayDialog(m_Dialog["Lose"]);
         }
     }
-    public void OnThink()
-    {
 
-    }
     public void OnCall()
     {
         if (m_Dialog.ContainsKey("Call"))
@@ -250,7 +272,52 @@ public class OpponentScript : MonoBehaviour
     }
     public void OnOpponentMatch()
     {
+        if (m_Dialog.ContainsKey("OpponentMatch"))
+        {
+            p_DisplayDialog(m_Dialog["OpponentMatch"]);
+        }
+    }
 
+    virtual public Move MakeMove(PokerState CurrentState)
+    {
+        Move ReturnValue = null;
+        if (CurrentState.Call)
+        {
+            float RandomXD = Random.Range(0, 1f);
+            if (RandomXD < 0.33f)
+            {
+                ReturnValue = new Move_Match();
+            }
+            else if (RandomXD < 0.66f)
+            {
+                ReturnValue = new Move_Raise();
+            }
+            else if (RandomXD < 1f)
+            {
+                ReturnValue = new Move_Fold();
+            }
+        }
+        else
+        {
+            float RandomXD = Random.Range(0, 1f);
+            if (RandomXD < 0.33f)
+            {
+                ReturnValue = new Move_StealCard();
+            }
+            else if (RandomXD < 0.66f)
+            {
+                ReturnValue = new Move_Call();
+            }
+            else if (RandomXD < 1)
+            {
+                ReturnValue = new Move_DiscardCards();
+                Move_DiscardCards CardsToDiscard = (Move_DiscardCards)ReturnValue;
+                Card CardToDiscard = CurrentState.OpponentHand[0];
+                CurrentState.OpponentHand[0] = CurrentState.AssociatedDeck.DrawCard();
+                CardsToDiscard.DiscardedCards.Add(CardToDiscard);
+            }
+        }
+        return (ReturnValue);
     }
 
     // Update is called once per frame
@@ -266,5 +333,231 @@ public class OpponentScript : MonoBehaviour
             }
         }
         m_CoRoutines = NewRoutines;
+    }
+
+    public virtual HandAnimation GetHandAnimation(List<GameObject> Cards, OpponentScript Opponent)
+    {
+        return (new HandAnimation(Cards, Opponent));
+    }
+
+    public class HandAnimation
+    {
+        Camera m_Camera;
+        public void Initialize()
+        {
+            m_EventSystem = FindObjectOfType<EventSystem>();
+            m_Camera = FindObjectOfType<Camera>();
+            //get scene object
+            GameObject CardScene = GameObject.FindGameObjectWithTag("OpponentPickScene");
+            AssociatedObject = GameObject.FindGameObjectWithTag("Hand");
+            //set opponent sprite
+            Canvas AssociatedCanvas = CardScene.GetComponentInChildren<Canvas>();
+            foreach (GameObject Object in m_Cards)
+            {
+                Object.transform.parent = AssociatedCanvas.gameObject.transform;
+            }
+            for (int i = 0; i < m_Cards.Count; i++)
+            {
+                m_Cards[i].transform.localPosition = new Vector2(-700 + i * 350, -450);
+                m_Cards[i].GetComponent<RectTransform>().sizeDelta = new Vector2(175, m_Cards[i].GetComponent<RectTransform>().sizeDelta.y);
+                m_CardPositions.Add(m_Cards[i].transform.localPosition);
+            }
+            m_ElapsedMoveTime = m_MoveAwayDuration + m_MoveBackDuration + m_MoveAgainDelay;
+        }
+        public HandAnimation(List<GameObject> Cards, OpponentScript Opponent)
+        {
+            m_Cards = Cards;
+            m_Opponent = Opponent;
+        }
+        public class GrabData
+        {
+            public float TotalHoverLength = 3;
+            public float HoverSpeed = 2000f;
+            public int MaxSwitchCount = -1;
+            public float GrabDelay = 0.5f;
+            public float GrabSpeed = 3000f;
+        }
+        public HandAnimation(List<GameObject> Cards, OpponentScript Opponent,GrabData GrabInfo)
+        {
+            m_Cards = Cards;
+            m_Opponent = Opponent;
+            m_HoverLength = GrabInfo.TotalHoverLength;
+            m_HoverSpeed = GrabInfo.HoverSpeed;
+            m_GrabDelay = GrabInfo.GrabDelay;
+            m_GrabSpeed = GrabInfo.GrabSpeed;
+            m_MaxSwitchCount = GrabInfo.MaxSwitchCount;
+        }
+
+        GameObject AssociatedObject;
+        List<GameObject> m_Cards;
+        List<Vector2> m_CardPositions = new List<Vector2>();
+        OpponentScript m_Opponent;
+
+        //event system
+        EventSystem m_EventSystem;
+
+        float m_HoverLength = 3;
+        float m_HoverSpeed = 2000f;
+        float m_GrabDelay = 0.5f;
+        float m_GrabSpeed = 3000f;
+        float m_GrabYLocation = 3f;
+        float m_ElapsedAnimation = 0;
+
+        int m_MaxSwitchCount = -1;
+        int m_CurrentCardTarget = 0;
+
+        float m_ElapsedGrabTime = 0;
+
+        int m_GrabbedCardIndex = -1;
+
+        float m_GrabbTransitionDelay = 1f;
+        float m_ElapsedGrabTransition = 0;
+
+
+
+        Vector2 p_CanvasToScreenSpace(Vector2 VectorToConvert)
+        {
+            VectorToConvert.x += 2560 / 2;//hardcoded af
+            VectorToConvert.y += 1440 / 2;
+            VectorToConvert.x = (VectorToConvert.x / (float)2560) * Screen.width;
+            VectorToConvert.y = (VectorToConvert.y / (float)1440) * Screen.height;
+            return (VectorToConvert);
+        }
+
+        int p_GetGrabbedCardIndex()
+        {
+            int ReturnValue = -1;
+            Vector3 FingerTipPosition = AssociatedObject.transform.localPosition -
+                new Vector3(0, AssociatedObject.GetComponent<RectTransform>().sizeDelta.y / 2) * AssociatedObject.transform.localScale.y;
+            FingerTipPosition = p_CanvasToScreenSpace(FingerTipPosition);
+
+            PointerEventData EventData = new PointerEventData(m_EventSystem);
+            EventData.position = FingerTipPosition;
+
+            List<RaycastResult> Results = new List<RaycastResult>();
+            m_EventSystem.RaycastAll(EventData, Results);
+            if (Results.Count > 0)
+            {
+                foreach (RaycastResult Result in Results)
+                {
+                    CardScript ScriptComponent = Result.gameObject.GetComponent<CardScript>();
+                    if (ScriptComponent != null)
+                    {
+                        ReturnValue = ScriptComponent.CardIndex;
+                        break;
+                    }
+                }
+            }
+
+            return (ReturnValue);
+        }
+
+        float m_MoveDistance = 400f;
+        float m_MoveAwayDuration = 0.15f;
+        float m_MoveBackDuration = 0.3f;
+        float m_MoveAgainDelay = 0.2f;
+
+        float m_ElapsedMoveTime = 0;
+        float m_MoveDirection = 0;
+
+        int m_SwitchCount = 0;
+        public int Update()
+        {
+            if (AssociatedObject == null)
+            {
+                return (-1);
+            }
+            Vector2 TargetDestination = m_CardPositions[m_CurrentCardTarget];
+
+            Vector3 FingerTipPosition = AssociatedObject.transform.localPosition -
+                new Vector3(0, AssociatedObject.GetComponent<RectTransform>().sizeDelta.y / 2) * AssociatedObject.transform.localScale.y;
+            FingerTipPosition = p_CanvasToScreenSpace(FingerTipPosition);
+            m_Opponent.SetEyeDirection(FingerTipPosition - new Vector3(Screen.width / 2, Screen.height / 2));
+            if(m_MaxSwitchCount != -1 && m_SwitchCount >=  m_MaxSwitchCount)
+            {
+                m_ElapsedAnimation = m_HoverLength;
+            }
+            if (m_ElapsedAnimation < m_HoverLength || Mathf.Abs(TargetDestination.x - AssociatedObject.transform.localPosition.x) > 1f)
+            {
+                //only use X
+                float XDiff = TargetDestination.x - AssociatedObject.transform.localPosition.x;
+                m_ElapsedAnimation += Time.deltaTime;
+                float XToAdd = Mathf.Min(Mathf.Abs(XDiff), m_HoverSpeed * Time.deltaTime) * Mathf.Sign(XDiff);
+                AssociatedObject.transform.localPosition += new Vector3(XToAdd, 0);
+                if (Mathf.Abs(XToAdd) < m_HoverSpeed * Time.deltaTime - 1)
+                {
+                    m_SwitchCount += 1;
+                    if(m_ElapsedAnimation < m_HoverLength)
+                    {
+                        int CurrentTarget = m_CurrentCardTarget;
+                        while (CurrentTarget == m_CurrentCardTarget)
+                        {
+                            m_CurrentCardTarget = (int)Random.Range(0.0f, 4.999f);
+                        }
+                    }
+                }
+            }
+            else
+            {
+                m_ElapsedGrabTime += Time.deltaTime;
+                if (m_ElapsedGrabTime > m_GrabDelay)
+                {
+                    if (Mathf.Abs(AssociatedObject.transform.localPosition.y - m_GrabYLocation) < 0.1f)
+                    {
+                        int CardIndex = p_GetGrabbedCardIndex();
+                        if (CardIndex != -1)
+                        {
+                            m_ElapsedGrabTransition += Time.deltaTime;
+                            if (m_ElapsedGrabTransition > m_GrabbTransitionDelay)
+                            {
+                                //determine grabbed card
+                                //m_GrabbedCardIndex = 1;
+                                m_GrabbedCardIndex = p_GetGrabbedCardIndex();
+                            }
+                            return (m_GrabbedCardIndex);
+                        }
+                        //return (m_GrabbedCardIndex);
+                    }
+                    else
+                    {
+                        float YDiff = m_GrabYLocation - AssociatedObject.transform.localPosition.y;
+                        float YDiffToAdd = Mathf.Min(m_GrabSpeed * Time.deltaTime, Mathf.Abs(YDiff)) * Mathf.Sign(YDiff);
+                        AssociatedObject.transform.localPosition += new Vector3(0, YDiffToAdd);
+                    }
+                }
+            }
+            if (m_ElapsedMoveTime > m_MoveAwayDuration + m_MoveBackDuration + m_MoveAgainDelay)
+            {
+                if (Input.GetKeyDown(KeyCode.D))
+                {
+                    m_ElapsedMoveTime = 0;
+                    m_MoveDirection = 1;
+                }
+                else if (Input.GetKeyDown(KeyCode.A))
+                {
+                    m_ElapsedMoveTime = 0;
+                    m_MoveDirection = -1;
+                }
+            }
+            else if (m_ElapsedMoveTime < m_MoveAwayDuration)
+            {
+                //calculate speed
+                float Speed = m_MoveDistance / m_MoveAwayDuration;
+                foreach (GameObject Object in m_Cards)
+                {
+                    Object.transform.localPosition += new Vector3(Speed * m_MoveDirection, 0) * Time.deltaTime;
+                }
+            }
+            else if (m_ElapsedMoveTime < m_MoveAwayDuration + m_MoveBackDuration)
+            {
+                float Speed = m_MoveDistance / m_MoveBackDuration;
+                foreach (GameObject Object in m_Cards)
+                {
+                    Object.transform.localPosition -= new Vector3(Speed * m_MoveDirection, 0) * Time.deltaTime;
+                }
+            }
+            m_ElapsedMoveTime += Time.deltaTime;
+            return (m_GrabbedCardIndex);
+        }
     }
 }

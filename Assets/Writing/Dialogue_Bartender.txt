@@ -1,4 +1,4 @@
-#WhateverBartender
+#Whatever
 "I see you can still hold your drink quite well."
 
 "Another drink? Very well, just a moment please."
@@ -19,7 +19,7 @@
 
 "Now then..."
 
-#LoseBartender
+#Lose
 "Oh well."
 
 "Godness gracious."
@@ -32,7 +32,7 @@
 
 "It would appear it is your win."
 
-#WinBartender
+#Win
 "Thank you for your patronage."
 
 "Hehe, it seems I have still got it."
