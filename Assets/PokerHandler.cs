@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using System.Linq;
-
+using UnityEngine.EventSystems;
 public enum DropType
 {
     Table,
@@ -115,10 +115,14 @@ public class PokerHandler : MonoBehaviour
     public GameObject CardObject;
 
     GameObject m_BettingMenu;
+
     class HandAnimation
     {
+        Camera m_Camera;
         public void Initialize()
         {
+            m_EventSystem = FindObjectOfType<EventSystem>();
+            m_Camera = FindObjectOfType<Camera>();
             //get scene object
             GameObject CardScene = GameObject.FindGameObjectWithTag("OpponentPickScene");
             AssociatedObject = GameObject.FindGameObjectWithTag("Hand");
@@ -143,6 +147,10 @@ public class PokerHandler : MonoBehaviour
         GameObject AssociatedObject;
         List<GameObject> m_CardPositions;
         OpponentScript m_Opponent;
+
+        //event system
+        EventSystem m_EventSystem;
+
         float m_HoverLength= 3;
         float m_HoverSpeed = 8f;
         float m_GrabDelay = 0.5f;
@@ -157,6 +165,34 @@ public class PokerHandler : MonoBehaviour
 
         float m_GrabbTransitionDelay = 1f;
         float m_ElapsedGrabTransition = 0;
+
+        int p_GetGrabbedCardIndex()
+        {
+            int ReturnValue = -1;
+            Vector3 FingerTipPosition = AssociatedObject.transform.position - 
+                new Vector3(0,(AssociatedObject.GetComponent<BoxCollider2D>().size.y/2)*AssociatedObject.transform.localScale.y);
+            FingerTipPosition = m_Camera.WorldToScreenPoint(FingerTipPosition);
+
+            PointerEventData EventData = new PointerEventData(m_EventSystem);
+            EventData.position = FingerTipPosition;
+
+            List<RaycastResult> Results = new List<RaycastResult>();
+            m_EventSystem.RaycastAll(EventData, Results);
+            if(Results.Count > 0)
+            {
+                foreach(RaycastResult Result in Results)
+                {
+                    CardScript ScriptComponent = Result.gameObject.GetComponent<CardScript>();
+                    if(ScriptComponent != null)
+                    {
+                        ReturnValue = ScriptComponent.CardIndex;
+                        break;
+                    }
+                }
+            }
+
+            return (ReturnValue);
+        }
         public int Update()
         {
             if (AssociatedObject == null)
@@ -164,9 +200,9 @@ public class PokerHandler : MonoBehaviour
                 return (-1);
             }
             Vector2 TargetDestination = m_CardPositions[m_CurrentCardTarget].transform.position;
-            TargetDestination = FindObjectOfType<Camera>().ScreenToWorldPoint(TargetDestination);
+            TargetDestination = m_Camera.ScreenToWorldPoint(TargetDestination);
 
-            m_Opponent.SetEyeDirection( (Vector2)FindObjectOfType<Camera>().WorldToScreenPoint(AssociatedObject.transform.position + new Vector3(0, -2)) - new Vector2(Screen.width / 2, Screen.height / 2));
+            m_Opponent.SetEyeDirection( (Vector2)m_Camera.WorldToScreenPoint(AssociatedObject.transform.position + new Vector3(0, -2)) - new Vector2(Screen.width / 2, Screen.height / 2));
 
             if (m_ElapsedAnimation < m_HoverLength ||  Mathf.Abs(TargetDestination.x - AssociatedObject.transform.position.x) > 0.1f)
             {
@@ -195,7 +231,9 @@ public class PokerHandler : MonoBehaviour
                         m_ElapsedGrabTransition += Time.deltaTime;
                         if (m_ElapsedGrabTransition > m_GrabbTransitionDelay)
                         {
-                            m_GrabbedCardIndex = 1;
+                            //determine grabbed card
+                            //m_GrabbedCardIndex = 1;
+                            m_GrabbedCardIndex = p_GetGrabbedCardIndex();
                         }
                     }
                     else
