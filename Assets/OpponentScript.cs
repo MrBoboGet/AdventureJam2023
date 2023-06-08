@@ -31,6 +31,8 @@ public class OpponentScript : MonoBehaviour
     Canvas m_AssociatedCanvas;
 
 
+    GameObject m_DialogObject;
+
     public bool InAnimation()
     {
         return (m_InAnimation);
@@ -39,6 +41,16 @@ public class OpponentScript : MonoBehaviour
     void Start()
     {
         m_AssociatedCanvas = FindObjectOfType<Canvas>();
+
+
+        m_DialogObject = Instantiate(DialogObject);
+        Vector3 OriginalPosition = m_DialogObject.transform.position;
+        m_DialogObject.transform.parent = m_AssociatedCanvas.gameObject.transform;
+        m_DialogObject.transform.position = new Vector3();
+        m_DialogObject.transform.localPosition = OriginalPosition;
+
+
+
 
         GameObject EyeObject = new GameObject("asdasd");
         EyeObject.AddComponent<SpriteRenderer>();
@@ -83,7 +95,10 @@ public class OpponentScript : MonoBehaviour
             {
                 int HashTagPosition = Line.IndexOf('#');
                 CurrentTag = Line.Substring(HashTagPosition + 1);
-                m_Dialog.Add(CurrentTag, new List<string>());
+                if(!m_Dialog.ContainsKey(CurrentTag))
+                {
+                    m_Dialog.Add(CurrentTag, new List<string>());
+                }
             }
             else
             {
@@ -129,17 +144,12 @@ public class OpponentScript : MonoBehaviour
         GetComponent<SpriteRenderer>().sprite = OldSprite;
         m_InAnimation = false;
     }
+    int m_DialogCount = 0;
     IEnumerator p_DisplayDialog(string DialogString)
     {
-        GameObject IngameDialogObject = Instantiate(DialogObject);
-        Vector3 OriginalPosition = IngameDialogObject.transform.position;
-        //IngameDialogObject.transform.localPosition = IngameDialogObject.transform.position;
-        //IngameDialogObject.transform.position = new Vector3();
-        IngameDialogObject.transform.parent = m_AssociatedCanvas.gameObject.transform;
-
-        IngameDialogObject.transform.position = new Vector3();
-        IngameDialogObject.transform.localPosition = OriginalPosition;
-        IngameDialogObject.GetComponentInChildren<TMPro.TextMeshProUGUI>().text = DialogString;
+        m_DialogCount += 1;
+        m_DialogObject.SetActive(true);
+        m_DialogObject.GetComponentInChildren<TMPro.TextMeshProUGUI>().text = DialogString;
 
         float DialogDuration = ChangeDuration;
         float ElapsedTime = 0;
@@ -148,7 +158,12 @@ public class OpponentScript : MonoBehaviour
             ElapsedTime += Time.deltaTime;
             yield return null;
         }
-        Destroy(IngameDialogObject);
+        m_DialogCount -= 1;
+        if(m_DialogCount == 0)
+        {
+            m_DialogObject.SetActive(false);
+        }
+        //Destroy(IngameDialogObject);
     }
     void p_DisplayDialog(List<string> PossibleDialogs)
     {
@@ -180,25 +195,54 @@ public class OpponentScript : MonoBehaviour
     {
 
     }
+    public void OnCall()
+    {
+        if (m_Dialog.ContainsKey("Call"))
+        {
+            p_DisplayDialog(m_Dialog["Call"]);
+        }
+    }
     public void OnFold()
     {
-
+        if (m_Dialog.ContainsKey("Fold"))
+        {
+            p_DisplayDialog(m_Dialog["Fold"]);
+        }
+    }
+    public void OnOpponentCall()
+    {
+        if (m_Dialog.ContainsKey("OpponentCall"))
+        {
+            p_DisplayDialog(m_Dialog["OpponentCall"]);
+        }
     }
     public void OnOpponentFold()
     {
-
+        if (m_Dialog.ContainsKey("OpponentFold"))
+        {
+            p_DisplayDialog(m_Dialog["OpponentFold"]);
+        }
     }
     public void OnRaise()
     {
-
+        if (m_Dialog.ContainsKey("Raise"))
+        {
+            p_DisplayDialog(m_Dialog["Raise"]);
+        }
     }
     public void OnOpponentRaise()
     {
-
+        if (m_Dialog.ContainsKey("OpponentRaise"))
+        {
+            p_DisplayDialog(m_Dialog["OpponentRaise"]);
+        }
     }
     public void OnMatch()
     {
-
+        if (m_Dialog.ContainsKey("Match"))
+        {
+            p_DisplayDialog(m_Dialog["Match"]);
+        }
     }
     public void OnOpponentMatch()
     {

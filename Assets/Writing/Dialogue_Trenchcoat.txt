@@ -1,4 +1,4 @@
-#WhateverTrenchcoat
+#Whatever
 "Hmpf, I see straight through you."
 
 "Punk."
@@ -45,3 +45,26 @@
 
 "H-hmmm... Interesting..."
 
+#Fold
+"Shit hand smh smh smh"
+
+#Raise
+"I see straight through your bluff"
+
+#Match
+"Matching"
+
+#Call
+"Let's see those cards"
+
+
+
+#OpponentRaise
+"You don't seem to fond of your money"
+
+#OpponentCall
+
+"dasjkljakldsjklasd"
+
+#OpponentFold
+"Can't handle the pressure huh"

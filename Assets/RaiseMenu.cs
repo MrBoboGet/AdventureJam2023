@@ -21,6 +21,11 @@ public class RaiseMenu : MonoBehaviour
 
     public PokerHandler AssociatedHandler = null;
 
+    public void SetPot(int CurrentStake,int PlayerStake)
+    {
+        GetComponentInChildren<TMPro.TextMeshProUGUI>().text = "Current stake: " + CurrentStake + "$\nYour stake: "+PlayerStake+"$";
+    }
+
     public void OnMatch()
     {
         //AssociatedHandler.

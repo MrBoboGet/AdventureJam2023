@@ -114,7 +114,7 @@ public class PokerHandler : MonoBehaviour
 {
     public GameObject CardObject;
 
-    GameObject m_BettingMenu;
+    RaiseMenu m_BettingMenu;
 
     class HandAnimation
     {
@@ -352,7 +352,8 @@ public class PokerHandler : MonoBehaviour
     int m_DiscardedCard = 0;
     Vector2 GetPosition(int CardIndex)
     {
-        return (new Vector2(-400 + CardIndex*200, -350));
+        //return (new Vector2(-400 + CardIndex*200, -350));
+        return (new Vector2(-240 + CardIndex*120, -350));
     }
 
     
@@ -402,7 +403,7 @@ public class PokerHandler : MonoBehaviour
         m_PokerPaused = true;
         m_CurrentPokerState.PlayerTurn = true;
         StartCoroutine(p_WaitForAnimation());
-        m_BettingMenu.SetActive(false);
+        m_BettingMenu.gameObject.SetActive(false);
         //
     }
     void p_StartBettingSequence()
@@ -410,11 +411,11 @@ public class PokerHandler : MonoBehaviour
         m_CurrentPokerState.Call = true;
         if(m_CurrentPokerState.PlayerTurn)
         {
-            m_BettingMenu.SetActive(true);
+            m_BettingMenu.gameObject.SetActive(true);
         }
         else
         {
-            m_BettingMenu.SetActive(false);
+            m_BettingMenu.gameObject.SetActive(false);
         }
     }
 
@@ -680,7 +681,7 @@ public class PokerHandler : MonoBehaviour
         m_SceneObject = GameObject.FindGameObjectWithTag("PokerScene");
         m_AssociatedDeck = FindObjectOfType<Deck>();
         m_CurrentPokerState.AssociatedDeck = m_AssociatedDeck;
-        m_BettingMenu = GameObject.FindObjectOfType<RaiseMenu>(true).gameObject;
+        m_BettingMenu = GameObject.FindObjectOfType<RaiseMenu>(true);
         m_GlobalCanvas = m_SceneObject.GetComponentInChildren<Canvas>();
         //create hand
         for(int i = 0; i < 5;i++)
@@ -805,6 +806,8 @@ public class PokerHandler : MonoBehaviour
         m_CurrentPokerState.PlayerPot += TotalRaise;
         m_CurrentPokerState.PlayerCash -= TotalRaise;
         m_CurrentPokerState.PlayerTurn = false;
+
+        m_OpponentObject.OnOpponentRaise();
         p_UpdatePot();
     }
     public void OnMatch()
@@ -814,6 +817,7 @@ public class PokerHandler : MonoBehaviour
         m_CurrentPokerState.PlayerPot += TotalRaise;
         m_CurrentPokerState.PlayerCash -= TotalRaise;
         m_CurrentPokerState.PlayerTurn = false;
+        m_OpponentObject.OnOpponentMatch();
         p_UpdatePot();
         p_InitializeRevealSequence();
         //reveal sequence
@@ -824,6 +828,7 @@ public class PokerHandler : MonoBehaviour
         m_CurrentPokerState.PlayerPot = 0;
         m_CurrentPokerState.OpponentPot = 0;
         m_CurrentPokerState.PlayerTurn = false;
+        m_OpponentObject.OnOpponentFold();
         p_InitializeNewRound();
         p_UpdatePot();
     }
@@ -831,6 +836,7 @@ public class PokerHandler : MonoBehaviour
     {
         m_CurrentPokerState.PlayerTurn = false;
         p_StartBettingSequence();
+        m_OpponentObject.OnOpponentCall();
         m_CurrentPokerState.PlayerCash -= 2;
         m_CurrentPokerState.PlayerPot += 2;
     }
@@ -979,28 +985,34 @@ public class PokerHandler : MonoBehaviour
                     {
                         if (NewMove is Move_Raise)
                         {
+                            m_OpponentObject.OnRaise();
                             int NewTotalPot = m_CurrentPokerState.PlayerPot + 2;
                             int TotalRaise = NewTotalPot - m_CurrentPokerState.OpponentPot;
                             m_CurrentPokerState.OpponentPot += TotalRaise;
                             m_CurrentPokerState.OpponentCash -= TotalRaise;
-                            m_BettingMenu.SetActive(true);
+                            m_BettingMenu.gameObject.SetActive(true);
+                            m_BettingMenu.SetPot(m_CurrentPokerState.OpponentPot, m_CurrentPokerState.PlayerPot);
                             p_UpdatePot();
                         }
                         else if (NewMove is Move_Match)
                         {
+                            m_OpponentObject.OnMatch();
                             int NewTotalPot = m_CurrentPokerState.PlayerPot;
                             int TotalRaise = NewTotalPot - m_CurrentPokerState.OpponentPot;
                             m_CurrentPokerState.OpponentPot += TotalRaise;
                             m_CurrentPokerState.OpponentCash -= TotalRaise;
-                            m_BettingMenu.SetActive(true);
+                            m_BettingMenu.gameObject.SetActive(true);
+                            m_BettingMenu.SetPot(m_CurrentPokerState.OpponentPot, m_CurrentPokerState.PlayerPot);
                             p_UpdatePot();
                         }
                         else if(NewMove is Move_Fold)
                         {
+                            m_OpponentObject.OnFold();
                             m_CurrentPokerState.PlayerCash += m_CurrentPokerState.PlayerPot + m_CurrentPokerState.OpponentPot;
                             m_CurrentPokerState.PlayerPot = 0;
                             m_CurrentPokerState.OpponentPot = 0;
-                            m_BettingMenu.SetActive(true);
+                            m_BettingMenu.gameObject.SetActive(true);
+                            m_BettingMenu.SetPot(m_CurrentPokerState.OpponentPot, m_CurrentPokerState.PlayerPot);
                             p_InitializeNewRound();
                             p_UpdatePot();
                         }
@@ -1009,6 +1021,8 @@ public class PokerHandler : MonoBehaviour
                     {
                         if(NewMove is Move_Call)
                         {
+                            m_OpponentObject.OnCall();
+                            m_BettingMenu.SetPot(m_CurrentPokerState.OpponentPot, m_CurrentPokerState.PlayerPot);
                             p_StartBettingSequence();
                         }
                         else if(NewMove is Move_DiscardCards)
