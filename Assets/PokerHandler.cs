@@ -51,6 +51,9 @@ public class PokerState
     public int TurnCount = 0;
     public int DiscardedCards = 0;
 
+    public int PlayerHP = 3;
+    public int OpponentHP = 3;
+
     public List<Card> PlayerHand = new List<Card>();
     public List<Card> OpponentHand = new List<Card>();
     public Deck AssociatedDeck;
@@ -219,8 +222,31 @@ public class PokerHandler : MonoBehaviour
             DrawCard(i);
             m_CurrentPokerState.OpponentHand[i] = m_CurrentPokerState.AssociatedDeck.DrawCard(); 
         }
+
+
+        //check if anyone has negative hp
+        if(m_CurrentPokerState.PlayerCash < 0)
+        {
+            FindObjectOfType<LifeContainer>().DecreasePlayerHP();
+            m_CurrentPokerState.PlayerHP -= 1;
+            m_CurrentPokerState.PlayerCash = 15;
+            m_CurrentPokerState.OpponentCash = 15;
+            //initialize dialog, could be special state......................
+
+        }
+        else if(m_CurrentPokerState.OpponentCash < 0)
+        {
+            m_CurrentPokerState.OpponentHP -= 1;
+            m_CurrentPokerState.PlayerCash = 15;
+            m_CurrentPokerState.OpponentCash = 15;
+            FindObjectOfType<LifeContainer>().DecreaseOpponentHP();
+        }
+
+
         m_PokerPaused = false;
     }
+
+
     void p_InitializeNewRound()
     {
         m_CurrentPokerState.PlayerPot = 2;
@@ -229,12 +255,17 @@ public class PokerHandler : MonoBehaviour
         m_CurrentPokerState.OpponentCash -= 2;
         m_CurrentPokerState.TurnCount = 0;
 
+
+        
         m_CurrentPokerState.Call = false;
         p_UpdatePot();
         m_PokerPaused = true;
         m_CurrentPokerState.PlayerTurn = true;
-        StartCoroutine(p_WaitForAnimation());
+        //if someone is at negative money, they loose hp
         m_BettingMenu.gameObject.SetActive(false);
+
+
+        StartCoroutine(p_WaitForAnimation());
         //
     }
     void p_StartBettingSequence()
@@ -763,7 +794,18 @@ public class PokerHandler : MonoBehaviour
     }
     void Update()
     {
-        
+        //DEBUG AFFFF
+        if(Input.GetKeyDown(KeyCode.J))
+        {
+            FindObjectOfType<LifeContainer>().DecreasePlayerHP();
+        }
+        if(Input.GetKeyDown(KeyCode.K))
+        {
+            FindObjectOfType<LifeContainer>().DecreaseOpponentHP();
+        }
+        //
+
+
         if(m_RevealSequence || m_PokerPaused)
         {
             m_Timer.gameObject.SetActive(false);
