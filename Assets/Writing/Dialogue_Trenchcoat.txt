@@ -55,7 +55,13 @@
 #Call
 "Let's see those cards"
 
+#1
 
+#2
+
+#3
+
+#RoundWin
 
 #OpponentRaise
 "Not too fond of your money, are you?"
