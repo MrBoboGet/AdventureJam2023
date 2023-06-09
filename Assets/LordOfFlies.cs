@@ -57,10 +57,11 @@ public class LordOfFlies : OpponentScript
 
         float m_ToPositionTime = 2f;
         float m_WaitDelay = 0.5f;
-        public override int Update()
-        {
-        
-        }
+
+        //public override int Update()
+        //{
+        //
+        //}
     }
 
     public virtual HandAnimation GetHandAnimation(List<GameObject> Cards, OpponentScript Opponent)
