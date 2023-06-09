@@ -27,6 +27,12 @@ public class Dialog : MonoBehaviour
     {
         m_AssociatedReciever = textReciever;
     }
+
+    System.Action m_FinishedAction = null;
+    public void SetDoneAction(System.Action WhenFinished)
+    {
+        m_FinishedAction = WhenFinished;
+    }
     // Update is called once per frame
     void Update()
     {
@@ -64,6 +70,7 @@ public class Dialog : MonoBehaviour
             else
             {
                 m_AssociatedReciever.Finish();
+                m_FinishedAction();
             }
         }
     }

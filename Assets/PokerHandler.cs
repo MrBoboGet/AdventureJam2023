@@ -14,6 +14,17 @@ public class Move
 
 }
 
+public static class GlobalTransitionInfo
+{
+    public static UnityEngine.SceneManagement.Scene BattleScene;
+}
+[System.Serializable]
+public class TransitionInfo
+{
+    public UnityEngine.SceneManagement.Scene BattleScene;
+    public UnityEngine.SceneManagement.Scene LoseScene;
+    public UnityEngine.SceneManagement.Scene NextScene;
+}
 public class Move_StealCard : Move
 {
     int DiscardedCardIndex = 0;
@@ -82,6 +93,7 @@ public class PokerHandler : MonoBehaviour
 
     RaiseMenu m_BettingMenu;
 
+    public TransitionInfo Transitions;
     class PickHandler
     {
         public List<GameObject> ObjectsToArrange = new List<GameObject>();
@@ -223,27 +235,48 @@ public class PokerHandler : MonoBehaviour
             m_CurrentPokerState.OpponentHand[i] = m_CurrentPokerState.AssociatedDeck.DrawCard(); 
         }
 
+        m_PokerPaused = false;
 
         //check if anyone has negative hp
         if(m_CurrentPokerState.PlayerCash < 0)
         {
+            m_PokerPaused = true;
             FindObjectOfType<LifeContainer>().DecreasePlayerHP();
             m_CurrentPokerState.PlayerHP -= 1;
             m_CurrentPokerState.PlayerCash = 15;
             m_CurrentPokerState.OpponentCash = 15;
+            if(m_CurrentPokerState.PlayerHP == 0)
+            {
+                //load loose scene
+                UnityEngine.SceneManagement.SceneManager.LoadScene(Transitions.LoseScene.name);
+            }
             //initialize dialog, could be special state......................
-
+            m_OpponentObject.DisplayDialog("RoundWin", () =>
+             {
+                 m_PokerPaused = false;
+                 p_InitializeNewRound();
+             });
         }
         else if(m_CurrentPokerState.OpponentCash < 0)
         {
+            m_PokerPaused = true;
             m_CurrentPokerState.OpponentHP -= 1;
             m_CurrentPokerState.PlayerCash = 15;
             m_CurrentPokerState.OpponentCash = 15;
+            m_OpponentObject.DisplayDialog(""+(3-m_CurrentPokerState.OpponentHP), () =>
+            {
+                if (m_CurrentPokerState.OpponentHP == 0)
+                {
+                    //load loose scene
+                    UnityEngine.SceneManagement.SceneManager.LoadScene(Transitions.NextScene.name);
+                }
+                m_PokerPaused = false;
+                p_InitializeNewRound(); 
+            });
             FindObjectOfType<LifeContainer>().DecreaseOpponentHP();
         }
 
 
-        m_PokerPaused = false;
     }
 
 
@@ -532,6 +565,7 @@ public class PokerHandler : MonoBehaviour
     Stress m_StressObject;
     void Start()
     {
+        GlobalTransitionInfo.BattleScene = Transitions.BattleScene;
         m_StressObject = FindObjectOfType<Stress>();
         m_Timer = FindObjectOfType<TimerScript>();
         m_OpponentObject = FindObjectOfType<OpponentScript>();
@@ -798,6 +832,11 @@ public class PokerHandler : MonoBehaviour
         if(Input.GetKeyDown(KeyCode.J))
         {
             FindObjectOfType<LifeContainer>().DecreasePlayerHP();
+        }
+        if(Input.GetKeyDown(KeyCode.Space))
+        {
+            m_CurrentPokerState.OpponentCash = -1;
+            p_InitializeNewRound();
         }
         if(Input.GetKeyDown(KeyCode.K))
         {
