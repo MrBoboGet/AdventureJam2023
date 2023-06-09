@@ -49,6 +49,7 @@ public class PokerState
     public bool PlayerTurn = true;
     public bool Call = false;
     public int TurnCount = 0;
+    public int DiscardedCards = 0;
 
     public List<Card> PlayerHand = new List<Card>();
     public List<Card> OpponentHand = new List<Card>();
@@ -606,6 +607,8 @@ public class PokerHandler : MonoBehaviour
                 //AssociatedScript.gameObject.transform.parent = m_GlobalCanvas.gameObject.transform;
             }
             m_PickHandler.Initialize();
+            m_CurrentPokerState.TurnCount += 1;
+            m_CurrentPokerState.PlayerTurn = false;
         }
         else if(Type == DropType.Table)
         {
@@ -618,9 +621,13 @@ public class PokerHandler : MonoBehaviour
             AssociatedCard.Drop();
             //replace card
             DrawCard(AssociatedCard.CardIndex);
+            m_CurrentPokerState.DiscardedCards += 1;
+            if(m_CurrentPokerState.DiscardedCards == 2)
+            {
+                m_CurrentPokerState.TurnCount += 1;
+                m_CurrentPokerState.PlayerTurn = false;
+            }
         }
-        m_CurrentPokerState.TurnCount += 1;
-        m_CurrentPokerState.PlayerTurn = false;
     }
 
 
@@ -663,6 +670,17 @@ public class PokerHandler : MonoBehaviour
         m_OpponentObject.OnOpponentFold();
         p_InitializeNewRound();
         p_UpdatePot();
+    }
+
+    public void OnPass()
+    {
+        if(!m_CurrentPokerState.PlayerTurn)
+        {
+            Oof();
+            return;
+        }
+        m_CurrentPokerState.PlayerTurn = false;
+        m_CurrentPokerState.TurnCount += 1;
     }
     public void OnCall()
     {
@@ -849,6 +867,7 @@ public class PokerHandler : MonoBehaviour
                     Move NewMove = m_OpponentObject.MakeMove(m_CurrentPokerState);
                     m_CurrentPokerState.PlayerTurn = true;
                     m_CurrentPokerState.TurnCount += 1;
+                    m_CurrentPokerState.DiscardedCards = 0;
                     if (m_CurrentPokerState.Call)
                     {
                         if (NewMove is Move_Raise)

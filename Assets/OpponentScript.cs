@@ -45,7 +45,7 @@ public class OpponentScript : MonoBehaviour
         return (m_InAnimation);
     }
     // Start is called before the first frame update
-    void Start()
+    public void Start()
     {
         m_AssociatedCanvas = FindObjectOfType<Canvas>();
 

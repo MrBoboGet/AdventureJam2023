@@ -2,12 +2,14 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class BartenderBehaviour : OpponentScript
+public class Pass : MonoBehaviour
 {
     // Start is called before the first frame update
+
+    PokerHandler m_AssociatedHandler;
     void Start()
     {
-        base.Start();
+        m_AssociatedHandler = FindObjectOfType<PokerHandler>();
     }
 
     // Update is called once per frame
@@ -16,8 +18,8 @@ public class BartenderBehaviour : OpponentScript
         
     }
 
-    public override HandAnimation GetHandAnimation(List<GameObject> Cards, OpponentScript Opponent)
+    public void OnPass()
     {
-        return (new HandAnimation(Cards, Opponent));
+        m_AssociatedHandler.OnPass();
     }
 }

@@ -11,15 +11,18 @@ public class LordOfFlies : OpponentScript
 
 
     Canvas m_FlyCanvas;
+    int MaxFlyCount = 10;
     void Start()
     {
+        base.Start();
+
         GameObject Canvas = Instantiate(CanvasObject);
         m_FlyCanvas = Canvas.GetComponent<Canvas>();
     }
-    Dictionary<int, GameObject> m_FlyObjects;
+    Dictionary<int, GameObject> m_FlyObjects = new Dictionary<int, GameObject>();
     int m_CurrentFlyID = 0;
 
-    public void OnFlySway(int FlyID)
+    public void OnFlySwat(int FlyID)
     {
         m_FlyObjects.Remove(FlyID);
     }
@@ -27,7 +30,8 @@ public class LordOfFlies : OpponentScript
     void SpawnFly()
     {
         GameObject NewFly = Instantiate(FlyObject);
-        m_FlyObjects[m_CurrentFlyID] = Instantiate(NewFly);
+        NewFly.transform.parent = m_FlyCanvas.gameObject.transform;
+        m_FlyObjects.Add(m_CurrentFlyID,NewFly);
         m_CurrentFlyID += 1;
 
         float Margin = 200;
@@ -36,6 +40,7 @@ public class LordOfFlies : OpponentScript
         NewFly.transform.localPosition = new Vector3(Random.Range(-XRange, XRange), Random.Range(-YRange, YRange));
         NewFly.GetComponent<FlyScript>().Lord = this;
         NewFly.GetComponent<FlyScript>().ID = m_CurrentFlyID;
+        m_ElapsedSpawnTime = 0;
     }
 
     float m_FlySpawnDelay = 1f;
@@ -44,6 +49,11 @@ public class LordOfFlies : OpponentScript
     // Update is called once per frame
     void Update()
     {
+        if(m_FlyObjects.Count >= MaxFlyCount)
+        {
+            m_ElapsedSpawnTime = 0;
+            return;
+        }
         m_ElapsedSpawnTime += Time.deltaTime;
         if(m_ElapsedSpawnTime >= m_FlySpawnDelay)
         {
