@@ -68,7 +68,7 @@
 
 #OpponentCall
 
-"Oh, you're approaching me?"
+"O-oh, you're approaching me?"
 
 #OpponentFold
 "Couldn't handle the pressure huh?"
