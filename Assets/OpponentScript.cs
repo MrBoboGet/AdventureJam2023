@@ -12,6 +12,7 @@ public class CharacterAnimation
 
 public class OpponentScript : MonoBehaviour
 {
+    public TransitionInfo Transitions;
     public float EyeRadius = 0.1f;
     public Sprite NeutralSprite;
     public Sprite WhiteEye;

@@ -14,7 +14,7 @@ GameObject:
   - component: {fileID: 1392094826569702261}
   - component: {fileID: 1392094826569702267}
   m_Layer: 7
-  m_Name: Yugi
+  m_Name: Bartender
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -76,7 +76,7 @@ SpriteRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: -10
-  m_Sprite: {fileID: 21300000, guid: 574b0da87801b664fb913a054abebd54, type: 3}
+  m_Sprite: {fileID: 21300000, guid: ccc40a274c76b4e4da53bfa18f323fd8, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
@@ -104,7 +104,7 @@ BoxCollider2D:
   m_SpriteTilingProperty:
     border: {x: 0, y: 0, z: 0, w: 0}
     pivot: {x: 0.5, y: 0.5}
-    oldSize: {x: 28.000002, y: 25.005861}
+    oldSize: {x: 32, y: 25.265625}
     newSize: {x: 1, y: 1}
     adaptiveTilingThreshold: 0.5
     drawMode: 0
@@ -126,21 +126,21 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   Transitions:
-    BattleScene: Assets/Scenes/Yugi_Battle.unity
-    LoseScene: Assets/Scenes/Yugi_Lose.unity
-    NextScene: Assets/Scenes/Yugi_Post.unity
+    BattleScene: Assets/Scenes/Trench_Battle.unity
+    LoseScene: Assets/Scenes/Lose.unity
+    NextScene: Assets/Scenes/Bartender_Post.unity
   EyeRadius: 0.13
-  NeutralSprite: {fileID: 21300000, guid: 574b0da87801b664fb913a054abebd54, type: 3}
-  WhiteEye: {fileID: 21300000, guid: b25646dabe23f4d4481fb6b3af4e0688, type: 3}
-  EyeSprite: {fileID: 21300000, guid: f055ded2fc6fb5849b241f635cda03f2, type: 3}
-  TellSprite: {fileID: 21300000, guid: 574b0da87801b664fb913a054abebd54, type: 3}
+  NeutralSprite: {fileID: 21300000, guid: f7741b077e4f9534fab8a4f81c39d7a3, type: 3}
+  WhiteEye: {fileID: 21300000, guid: 35023a817c0857a4b8bfd8a3a12ee445, type: 3}
+  EyeSprite: {fileID: 21300000, guid: 3aefef91c8cc7bf428c2d6629bb82c6a, type: 3}
+  TellSprite: {fileID: 21300000, guid: d2265592861905349b731e35f4b896c6, type: 3}
   WinSprite:
-    SpriteAnimation: {fileID: 21300000, guid: f5bc453b39d130f478bf010888a71549, type: 3}
+    SpriteAnimation: {fileID: 21300000, guid: f7741b077e4f9534fab8a4f81c39d7a3, type: 3}
     Clip: 
   LoseSprite:
-    SpriteAnimation: {fileID: 21300000, guid: e41ff5fe4b0f909489ec09b1b634cbf5, type: 3}
-    Clip: 
-  DialogText: {fileID: 4900000, guid: 38d3d530cf20bd345bd8dd4c3edb2cd3, type: 3}
+    SpriteAnimation: {fileID: 0}
+    Clip: Bartender_Lose
+  DialogText: {fileID: 4900000, guid: 70e008d9de35da74bb10f1d3c6579e2c, type: 3}
   DialogObject: {fileID: 5145691382794934176, guid: fada6ad3bec7d004f936d976a560caba, type: 3}
   LoreDialog: {fileID: 8032961317910320448, guid: f4ae4d29dd8938c43aaa2791c254bf29, type: 3}
 --- !u!95 &1392094826569702267

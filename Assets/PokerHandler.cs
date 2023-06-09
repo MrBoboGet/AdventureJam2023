@@ -16,14 +16,14 @@ public class Move
 
 public static class GlobalTransitionInfo
 {
-    public static UnityEngine.SceneManagement.Scene BattleScene;
+    public static string BattleScene;
 }
 [System.Serializable]
 public class TransitionInfo
 {
-    public UnityEngine.SceneManagement.Scene BattleScene;
-    public UnityEngine.SceneManagement.Scene LoseScene;
-    public UnityEngine.SceneManagement.Scene NextScene;
+    public string BattleScene;
+    public string LoseScene;
+    public string NextScene;
 }
 public class Move_StealCard : Move
 {
@@ -248,7 +248,7 @@ public class PokerHandler : MonoBehaviour
             if(m_CurrentPokerState.PlayerHP == 0)
             {
                 //load loose scene
-                UnityEngine.SceneManagement.SceneManager.LoadScene(Transitions.LoseScene.name);
+                UnityEngine.SceneManagement.SceneManager.LoadScene(Transitions.LoseScene);
             }
             //initialize dialog, could be special state......................
             m_OpponentObject.DisplayDialog("RoundWin", () =>
@@ -268,7 +268,7 @@ public class PokerHandler : MonoBehaviour
                 if (m_CurrentPokerState.OpponentHP == 0)
                 {
                     //load loose scene
-                    UnityEngine.SceneManagement.SceneManager.LoadScene(Transitions.NextScene.name);
+                    UnityEngine.SceneManagement.SceneManager.LoadScene(Transitions.NextScene);
                 }
                 m_PokerPaused = false;
                 p_InitializeNewRound(); 

@@ -125,6 +125,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 24906312f542fb64bbe10434c8b3286c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  Transitions:
+    BattleScene: Assets/Scenes/Trench_Battle.unity
+    LoseScene: Assets/Scenes/Lose.unity
+    NextScene: Assets/Scenes/Trench_Post.unity
   EyeRadius: 0.13
   NeutralSprite: {fileID: 21300000, guid: c325b326da371c141b8bb01e8d274ada, type: 3}
   WhiteEye: {fileID: 21300000, guid: b25646dabe23f4d4481fb6b3af4e0688, type: 3}
@@ -132,12 +136,13 @@ MonoBehaviour:
   TellSprite: {fileID: 21300000, guid: deebfcfed3926e440b649b7838477310, type: 3}
   WinSprite:
     SpriteAnimation: {fileID: 0}
-    Clip: Trenchcoat_Lose
+    Clip: Trenchcoat_Win
   LoseSprite:
     SpriteAnimation: {fileID: 0}
-    Clip: Bartender_Lose
-  Dialog: {fileID: 4900000, guid: 3a15423f626fe8e40a775e2982ddee55, type: 3}
+    Clip: Trenchcoat_Lose
+  DialogText: {fileID: 4900000, guid: 3a15423f626fe8e40a775e2982ddee55, type: 3}
   DialogObject: {fileID: 5145691382794934176, guid: fada6ad3bec7d004f936d976a560caba, type: 3}
+  LoreDialog: {fileID: 8032961317910320448, guid: f4ae4d29dd8938c43aaa2791c254bf29, type: 3}
 --- !u!95 &1392094826569702267
 Animator:
   serializedVersion: 4

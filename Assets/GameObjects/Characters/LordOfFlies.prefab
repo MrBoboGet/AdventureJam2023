@@ -47,6 +47,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6085609f28975464a912e6a96b931649, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  Transitions:
+    BattleScene: Assets/Scenes/Lord_Battle.unity
+    LoseScene: Assets/Scenes/Lose.unity
+    NextScene: Assets/Scenes/Lord_Post.unity
   EyeRadius: 0.1
   NeutralSprite: {fileID: 21300000, guid: 13e6bdbed2ad3f747b0844310deba574, type: 3}
   WhiteEye: {fileID: 21300000, guid: 6e0a39462243c064eaaf79c4a18d8436, type: 3}
@@ -58,7 +62,7 @@ MonoBehaviour:
   LoseSprite:
     SpriteAnimation: {fileID: 21300000, guid: 7a04773e0ebf55444aa5cc21d687bb2a, type: 3}
     Clip: 
-  DialogText: {fileID: 4900000, guid: 3a15423f626fe8e40a775e2982ddee55, type: 3}
+  DialogText: {fileID: 4900000, guid: 18f0c9721c0e1254c951825710c921e5, type: 3}
   DialogObject: {fileID: 5145691382794934176, guid: fada6ad3bec7d004f936d976a560caba, type: 3}
   LoreDialog: {fileID: 8032961317910320448, guid: f4ae4d29dd8938c43aaa2791c254bf29, type: 3}
   CanvasObject: {fileID: 8212510570731134455, guid: bbbc71315a8755b46beffdb708d5ada8, type: 3}
