@@ -18,7 +18,7 @@ public class Pass : MonoBehaviour
         
     }
 
-    public void OnPass()
+    public  void OnPass()
     {
         m_AssociatedHandler.OnPass();
     }

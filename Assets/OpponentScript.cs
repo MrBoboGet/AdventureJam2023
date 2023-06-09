@@ -166,7 +166,7 @@ public class OpponentScript : MonoBehaviour
     }
     IEnumerator p_ChangeSprite(CharacterAnimation Animation,float Duration)
     {
-        if(Animation.Clip != null)
+        if(Animation.Clip != null && Animation.Clip != "")
         {
             return (p_ChangeSprite(Animation.Clip, Duration));
         }
@@ -358,7 +358,7 @@ public class OpponentScript : MonoBehaviour
     }
 
     // Update is called once per frame
-    void Update()
+    public void Update()
     {
         List<IEnumerator> NewRoutines = new List<IEnumerator>();
         foreach(IEnumerator Routine in m_CoRoutines)
@@ -425,10 +425,10 @@ public class OpponentScript : MonoBehaviour
             m_MaxSwitchCount = GrabInfo.MaxSwitchCount;
         }
 
-        GameObject AssociatedObject;
-        List<GameObject> m_Cards;
-        List<Vector2> m_CardPositions = new List<Vector2>();
-        OpponentScript m_Opponent;
+        protected GameObject AssociatedObject;
+        protected List<GameObject> m_Cards;
+        protected List<Vector2> m_CardPositions = new List<Vector2>();
+        protected OpponentScript m_Opponent;
 
         //event system
         EventSystem m_EventSystem;
@@ -456,12 +456,12 @@ public class OpponentScript : MonoBehaviour
         {
             VectorToConvert.x += 2560 / 2;//hardcoded af
             VectorToConvert.y += 1440 / 2;
-            VectorToConvert.x = (VectorToConvert.x / (float)2560) * Screen.width;
-            VectorToConvert.y = (VectorToConvert.y / (float)1440) * Screen.height;
+            VectorToConvert.x = (VectorToConvert.x / 2560) * Screen.width;
+            VectorToConvert.y = (VectorToConvert.y / 1440) * Screen.height;
             return (VectorToConvert);
         }
 
-        int p_GetGrabbedCardIndex()
+        protected int p_GetGrabbedCardIndex()
         {
             int ReturnValue = -1;
             Vector3 FingerTipPosition = AssociatedObject.transform.localPosition -
@@ -498,7 +498,7 @@ public class OpponentScript : MonoBehaviour
         float m_MoveDirection = 0;
 
         int m_SwitchCount = 0;
-        public int Update()
+        virtual public int Update()
         {
             if (AssociatedObject == null)
             {

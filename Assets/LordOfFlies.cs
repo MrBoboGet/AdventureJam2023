@@ -40,15 +40,39 @@ public class LordOfFlies : OpponentScript
         NewFly.transform.localPosition = new Vector3(Random.Range(-XRange, XRange), Random.Range(-YRange, YRange));
         NewFly.GetComponent<FlyScript>().Lord = this;
         NewFly.GetComponent<FlyScript>().ID = m_CurrentFlyID;
+        if(Random.Range(0,1f) < 0.5f)
+        {
+            NewFly.transform.localScale = new Vector3();
+        }
         m_ElapsedSpawnTime = 0;
     }
 
-    float m_FlySpawnDelay = 1f;
+    class FlyHandAnimation : HandAnimation
+    {
+        public FlyHandAnimation(List<GameObject> Cards, OpponentScript Opponent) : base(Cards,Opponent)
+        {
+
+        }
+
+
+
+        //public override int Update()
+        //{
+        //
+        //}
+    }
+
+    public virtual HandAnimation GetHandAnimation(List<GameObject> Cards, OpponentScript Opponent)
+    {
+        return (new HandAnimation(Cards, Opponent));
+    }
+    float m_FlySpawnDelay = 2f;
 
     float m_ElapsedSpawnTime = 0f;
     // Update is called once per frame
     void Update()
     {
+        base.Update();
         if(m_FlyObjects.Count >= MaxFlyCount)
         {
             m_ElapsedSpawnTime = 0;
