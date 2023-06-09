@@ -1,0 +1,86 @@
+#Whatever
+"I wonder if they make dumbbell shaped cards..."
+
+"Nothing like a good workout, don't you agree?"
+
+"You want some fitness tips?"
+
+"Wanna workout together?"
+
+"Training is a great way to relax."
+
+#Win
+"Peace."
+
+"Ehehe~"
+
+"Guess I got lucky."
+
+":3"
+
+#Lose
+"Awww..."
+
+"Dang..."
+
+"Ehehe..."
+
+"Ops, hehe."
+
+#Fold
+"I think I'll sit this one out"
+
+#Raise
+"Just a bit more..."
+
+"I'm really feeling this hand!"
+
+#Match
+"Ooh! Let's compare!"
+
+"Just like armwrestling! Kind of, hehe."
+
+#Call
+"This is it!"
+
+"I think I've got it!"
+
+#1
+"Two more sets to go!"
+
+#2
+"Last set!"
+
+#3
+"Phew! It's my loss...
+
+#RoundWin
+"Excercising the brain is also important."
+
+#OpponentRaise
+"O-oooh...!"
+
+#OpponentCall
+"Aww, it was just getting good..."
+
+#OpponentFold
+"T-there's always next time!"
+
+#Hunkwalla
+"UWOOOOOOOO!!!"
+
+"LET'S MACHO!!!"
+
+"MUSCLE IS LIFE!!!"
+
+"LET'S MACHO TOGETHER!!!"
+
+"GIVE IT YOUR ALL!!!"
+
+"HHRRRRNNNNNGGG!!!"
+
+"THIS IS THE LAST SPURT!!!"
+
+"LET'S SEE THOSE MUSCLES FLEX!!!"
+
+"COME ON!!! PUMP THOSE MUSCLES!!!"

@@ -44,3 +44,25 @@
 "Need another drink, perhaps?"
 
 "Shall we continue?"
+
+#Fold
+
+#Raise
+
+#Match
+
+#Call
+
+#1
+
+#2
+
+#3
+
+#RoundWin
+
+#OpponentRaise
+
+#OpponentCall
+
+#OpponentFold
