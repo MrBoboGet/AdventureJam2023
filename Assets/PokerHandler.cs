@@ -730,6 +730,7 @@ public class PokerHandler : MonoBehaviour
             CardObjects.Add(NewCard);
         }
         m_OpponentPickHandler = m_OpponentObject.GetHandAnimation(CardObjects,m_OpponentObject);
+        m_OpponentObject.EnterPickCard();
     }
 
 
@@ -840,6 +841,7 @@ public class PokerHandler : MonoBehaviour
                 m_OpponentPickHandler = null;
                 p_ResetOpponentEyes();
                 DrawCard(GrabbedCardIndex);
+                m_OpponentObject.LeavePickCard();
             }
         }
         else 

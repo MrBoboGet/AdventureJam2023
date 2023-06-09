@@ -11,13 +11,28 @@ public class FlyScript : MonoBehaviour,IPointerClickHandler
 
     public float AnimationSpeed = 10;
     public List<Sprite> FlyAnimation = new List<Sprite>();
+    public Sprite DeadSprite;
 
 
     UnityEngine.UI.Image m_Image;
+
+
+    float m_ElapsedDeadTime = 0;
+    IEnumerator p_DeadDelay()
+    {
+        
+        while(m_ElapsedDeadTime < 0.5f)
+        {
+            m_ElapsedDeadTime += Time.deltaTime;
+            yield return null;
+        }
+        Destroy(gameObject);
+    }
+
     public void OnPointerClick(PointerEventData eventData)
     {
         Lord.OnFlySwat(ID);
-        Destroy(gameObject);
+        StartCoroutine(p_DeadDelay());
     }
 
     void Start()
@@ -31,8 +46,13 @@ public class FlyScript : MonoBehaviour,IPointerClickHandler
     float m_ElapsedAnimation = 0;
     void Update()
     {
+        if(m_ElapsedDeadTime > 0)
+        {
+            m_Image.sprite = DeadSprite;
+            return;
+        }
         m_ElapsedAnimation += Time.deltaTime;
-        if(m_ElapsedAnimation >= AnimationSpeed)
+        if(m_ElapsedAnimation >= AnimationSpeed || (Lord.FlyActive() && m_ElapsedAnimation > AnimationSpeed/2))
         {
             m_AnimationIndex += 1;
             if(m_AnimationIndex >= FlyAnimation.Count)

@@ -26,6 +26,10 @@ public class LordOfFlies : OpponentScript
     {
         m_FlyObjects.Remove(FlyID);
     }
+    public bool FlyActive()
+    {
+        return (m_FlyObjects.Count >= 3 && m_PickCard);
+    }
 
     void SpawnFly()
     {
@@ -48,7 +52,27 @@ public class LordOfFlies : OpponentScript
         }
         m_ElapsedSpawnTime = 0;
     }
+    public override void SetEyeDirection(Vector2 EyeDirection)
+    {
 
+    }
+    Sprite m_PreviousSprite = null;
+    bool m_PickCard = false;
+    public override void EnterPickCard()
+    {
+        m_PickCard = true;
+        m_PreviousSprite = GetComponent<SpriteRenderer>().sprite;
+        Animator AssociatedAnimator = GetComponent<Animator>();
+        AssociatedAnimator.enabled = true;
+        AssociatedAnimator.Play("Base Layer.Lord_Listen");
+    }
+    public override void LeavePickCard()
+    {
+        m_PickCard = false;
+        GetComponent<SpriteRenderer>().sprite = m_PreviousSprite;
+        Animator AssociatedAnimator = GetComponent<Animator>();
+        AssociatedAnimator.enabled = false;
+    }
     class FlyHandAnimation : HandAnimation
     {
 
@@ -70,9 +94,9 @@ public class LordOfFlies : OpponentScript
         float m_HandGrabY = 400;
         float m_ToPositionTime = 2f;
         float m_WaitDelay = 0.5f;
-        float m_GrabSpeed = 300f;
+        float m_GrabSpeed = 1000f;
 
-        float m_HandLastY = 300;
+        float m_HandLastY = 100;
 
 
         int m_CardToGrabIndex = 2;
