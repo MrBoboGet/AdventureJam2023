@@ -1,14 +1,39 @@
 #Whatever
+"Prepare yourself."
+
 #Win
+
 #Lose
+"If there is the will, then there is hope."
+
 #Fold
+"You’ve fought a valiant duel, my friend, and this is the hardest move I’ve ever had to make."
+
 #Raise
+"If you worship something enough, random chance suddenly becomes the will of all-powerful, supernatural forces."
+
 #Match
+
 #Call
+"It's time to duel."
+
 #1
+"I believe in the heart of the cards."
+
 #2
+"Ready or not, Spirit, this is where you take over."
+
 #3
+"A worthy opponent. Clearly, you must believe in the heart of the cards."
+
 #RoundWin
+"It will do no good to fight with hate in your heart."
+
 #OpponentRaise
+"My hand has no pathethic cards!"
+
 #OpponentCall
+"My hand has no pathethic cards!"
+
 #OpponentFold
+"It’s not always about being number one. It’s about dueling with bravery, honor, and respect! And most importantly, putting the needs of others ahead of your own!"
