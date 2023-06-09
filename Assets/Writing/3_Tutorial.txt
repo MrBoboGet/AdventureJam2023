@@ -1,0 +1,10 @@
+#Tutorial
+"We each start with five cards, then, we take turns either discarding up to two cards for new ones, discarding one card and takign one of the opponents cards, or simply passing the turn without doing anything."
+
+"To discard normally, simply drag and drop your cards to the table. If you want to take one of the opponents cards, simply drag and drop a card on top of the opponent."
+
+"But make sure you do not spend too much time contemplating your options, each of your rounds are timed, you see."
+
+"And also be careful not to try and do an action during the wrong time or when you cannot, as such behavior is usually frowned upon. The spite of your opponents might just get to your nerves, and as you become nervous the time in the rounds might start to fly away."
+
+""
