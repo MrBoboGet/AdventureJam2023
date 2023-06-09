@@ -1,7 +1,7 @@
 #Whatever
-"Prepare yourself."
 
 #Win
+"You fought well."
 
 #Lose
 "If there is the will, then there is hope."
@@ -13,6 +13,7 @@
 "If you worship something enough, random chance suddenly becomes the will of all-powerful, supernatural forces."
 
 #Match
+"It's timke to match."
 
 #Call
 "It's time to duel."
@@ -24,7 +25,7 @@
 "Ready or not, Spirit, this is where you take over."
 
 #3
-"A worthy opponent. Clearly, you must believe in the heart of the cards."
+"It’s not always about being number one. It’s about dueling with bravery, honor, and respect! And most importantly, putting the needs of others ahead of your own!"
 
 #RoundWin
 "It will do no good to fight with hate in your heart."
@@ -36,4 +37,4 @@
 "My hand has no pathethic cards!"
 
 #OpponentFold
-"It’s not always about being number one. It’s about dueling with bravery, honor, and respect! And most importantly, putting the needs of others ahead of your own!"
+"It's time to fold."
