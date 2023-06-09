@@ -222,7 +222,7 @@ public class PokerHandler : MonoBehaviour
         m_CurrentPokerState.OpponentPot = 2;
         m_CurrentPokerState.PlayerCash -= 2;
         m_CurrentPokerState.OpponentCash -= 2;
-
+        m_CurrentPokerState.TurnCount = 0;
 
         m_CurrentPokerState.Call = false;
         p_UpdatePot();
@@ -844,6 +844,7 @@ public class PokerHandler : MonoBehaviour
                     //make move
                     Move NewMove = m_OpponentObject.MakeMove(m_CurrentPokerState);
                     m_CurrentPokerState.PlayerTurn = true;
+                    m_CurrentPokerState.TurnCount += 1;
                     if (m_CurrentPokerState.Call)
                     {
                         if (NewMove is Move_Raise)

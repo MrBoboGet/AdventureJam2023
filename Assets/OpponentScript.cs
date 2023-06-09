@@ -2,20 +2,27 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.EventSystems;
+
+[System.Serializable]
+public class CharacterAnimation
+{
+    public Sprite SpriteAnimation = null;
+    public string Clip = null; 
+}
+
 public class OpponentScript : MonoBehaviour
 {
     public float EyeRadius = 0.1f;
     public Sprite NeutralSprite;
     public Sprite WhiteEye;
     public Sprite EyeSprite;
-    public Sprite TellSprite;
 
-    public Sprite WinSprite;
-    public Sprite LoseSprite;
+
+    public Sprite TellSprite;
+    public CharacterAnimation WinSprite;
+    public CharacterAnimation LoseSprite;
 
     public TextAsset Dialog;
-
-
     public GameObject DialogObject;
 
     GameObject m_EyeObject;
@@ -138,6 +145,36 @@ public class OpponentScript : MonoBehaviour
     public void HoverLeave()
     {
         GetComponent<SpriteRenderer>().sprite = NeutralSprite;
+    }
+
+    IEnumerator p_ChangeSprite(string NewSprite, float Duration)
+    {
+        m_InAnimation = true;
+        Sprite PreviousSprite = GetComponent<SpriteRenderer>().sprite;
+        Animator AssociatedAnimator = GetComponent<Animator>();
+        AssociatedAnimator.enabled = true;
+        AssociatedAnimator.Play("Base Layer."+NewSprite);
+        float ElapsedDuration = 0;
+        while (ElapsedDuration < Duration)
+        {
+            ElapsedDuration += Time.deltaTime;
+            yield return null;
+        }
+        AssociatedAnimator.enabled = false;
+        GetComponent<SpriteRenderer>().sprite = PreviousSprite;
+        m_InAnimation = false;
+    }
+    IEnumerator p_ChangeSprite(CharacterAnimation Animation,float Duration)
+    {
+        if(Animation.Clip != null)
+        {
+            return (p_ChangeSprite(Animation.Clip, Duration));
+        }
+        else if(Animation.SpriteAnimation != null)
+        {
+            return (p_ChangeSprite(Animation.SpriteAnimation, Duration));
+        }
+        return (null);
     }
 
     IEnumerator p_ChangeSprite(Sprite NewSprite,float Duration)
