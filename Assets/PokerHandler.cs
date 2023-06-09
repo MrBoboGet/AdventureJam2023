@@ -66,7 +66,11 @@ public class NPCOpponent
 
 
 
-
+public static class GameInfo
+{
+    public static GameObject Opponent = null;
+    public static Sprite BGSprite = null;
+}
 
 public class PokerHandler : MonoBehaviour
 {
