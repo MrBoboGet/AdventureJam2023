@@ -36,7 +36,6 @@ public class LordOfFlies : OpponentScript
         GameObject NewFly = Instantiate(FlyObject);
         NewFly.transform.parent = m_FlyCanvas.gameObject.transform;
         m_FlyObjects.Add(m_CurrentFlyID,NewFly);
-        m_CurrentFlyID += 1;
 
         float Margin = 200;
         float XRange = (2560 - Margin) / 2;
@@ -51,6 +50,7 @@ public class LordOfFlies : OpponentScript
             NewFly.transform.eulerAngles = new Vector3(0,180,0);
         }
         m_ElapsedSpawnTime = 0;
+        m_CurrentFlyID += 1;
     }
     public override void SetEyeDirection(Vector2 EyeDirection)
     {
