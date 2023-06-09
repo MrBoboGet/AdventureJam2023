@@ -9,6 +9,8 @@
 
 "Did you know? Flies make for great conversation partners."
 
+"Do you think eating souls would be filling?"
+
 #Win
 "Heh."
 
@@ -27,7 +29,7 @@
 "I hope I win this, for your sake."
 
 #Call
-"Bold of you. Maybe a little *too* bold..."
+"Ready or not, here I come... Hehehe..."
 
 #1
 "I will remember this."
@@ -42,7 +44,10 @@
 "Seconds, please."
 
 #OpponentRaise
+"Ehehehe... I'll be rich..."
 
 #OpponentCall
+"Bold of you. Maybe a little *too* bold..."
 
 #OpponentFold
+"Oh, that's too bad..."

@@ -31,7 +31,7 @@
 #Lose
 "N-not bad..."
 
-"B-beginner's luck, I'm sure..."
+"Didn't like that hand anyway."
 
 "H-happens to the best of us..."
 
@@ -56,10 +56,13 @@
 "Let's see those cards"
 
 #1
+"B-beginner's luck, I'm sure..."
 
 #2
+"A-all part of my master plan..."
 
 #3
+"...Even a third rate poker player can have good luck I guess..."
 
 #RoundWin
 
