@@ -55,14 +55,20 @@
 #Call
 "Let's see those cards"
 
+#1
 
+#2
+
+#3
+
+#RoundWin
 
 #OpponentRaise
 "Not too fond of your money, are you?"
 
 #OpponentCall
 
-"Oh, you're approaching me?"
+"O-oh, you're approaching me?"
 
 #OpponentFold
 "Couldn't handle the pressure huh?"

@@ -1,0 +1,32 @@
+#Tutorial
+"We each start with five cards, then, we take turns either discarding up to two cards for new ones, discarding one card and takign one of the opponents cards, or simply passing the turn without doing anything."
+
+"To discard normally, simply drag and drop your cards to the table. If you want to take one of the opponents cards, simply drag and drop a card on top of the opponent."
+
+"But make sure you do not spend too much time contemplating your options, as each of your turns are timed."
+
+"And also be careful not to try and do an action during the wrong time or when you cannot, as such behavior is usually frowned upon. The spite of your opponents might just get to your nerves, and as you become nervous the time in the turns might start to fly away."
+
+"Naturally, your opponent may also choose between discarding a card normally, or taking one from your hand."
+
+"Should they choose to try and take a card, you can always try to make them pick wrong by adjusting your hand with "A" and "D" at the last second."
+
+"By discarding, taking, or keeping cards you aim to create the standard pairings found in normal poker."
+
+"That is to say, from lowest to highest, a card with high numerical value, a pair, two different pairs, three of a kind, five cards in numerical sequence, five cards of the same suit, a pair with three of a kind, and four of a kind."
+
+"There are two more, called straight flush and royal flush, which are five cards in a sequence of the same suit, and the five highest cards in a sequence. Though these combinations are so rare I doubt you will have to worry too much about them."
+
+"After both you and your opponent have played two turns each, you, or your, opponent can choose to "call", meaning you are satisfied with with your hand and wish to start bidding money."
+
+"Both players always start by betting 2$, from here, you can either choose to raise with and additional 2$, match, meaning you and your opponent reveal your hands to each other, and fold, meaning you simply give up, without showing your cards, or seeing your opponents hand."
+
+"Both players have 150$ with which they play with, and when one side has lost all their money, that means the opposing player has won one round"
+
+"The first player to win three rounds wins the match."
+
+"So, did you get all of that? Did it jog your memory a bit?"
+
+"If not, well, then I suppose you can only remember by playing."
+
+"Now then, let us begin."
