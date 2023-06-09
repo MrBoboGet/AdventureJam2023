@@ -114,7 +114,7 @@ public class OpponentScript : MonoBehaviour
         }
     }
 
-    public void SetEyeDirection(Vector2 EyeDirection)
+    public virtual void SetEyeDirection(Vector2 EyeDirection)
     {
         if(EyeDirection.x == 0 && EyeDirection.y == 0)
         {
@@ -376,7 +376,14 @@ public class OpponentScript : MonoBehaviour
     {
         return (new HandAnimation(Cards, Opponent));
     }
+    public virtual void EnterPickCard()
+    {
 
+    }
+    public virtual void LeavePickCard()
+    {
+
+    }
     public class HandAnimation
     {
         Camera m_Camera;

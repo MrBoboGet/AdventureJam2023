@@ -59,6 +59,7 @@ MonoBehaviour:
   - {fileID: 21300000, guid: 354d75bd507076940897cf9f0983744e, type: 3}
   - {fileID: 21300000, guid: fd535bc50f4a31b4d92e36fe0a96f28f, type: 3}
   - {fileID: 21300000, guid: 5939473d3cd73fe44916dd3650037d73, type: 3}
+  DeadSprite: {fileID: 21300000, guid: 733612cfa9e02c2418ba78c8caada53a, type: 3}
 --- !u!222 &2667574318938741647
 CanvasRenderer:
   m_ObjectHideFlags: 0
