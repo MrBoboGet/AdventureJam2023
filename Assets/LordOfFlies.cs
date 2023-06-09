@@ -42,31 +42,99 @@ public class LordOfFlies : OpponentScript
         NewFly.GetComponent<FlyScript>().ID = m_CurrentFlyID;
         if(Random.Range(0,1f) < 0.5f)
         {
-            NewFly.transform.localScale = new Vector3();
+
+            //NewFly.GetComponent<UnityEngine.UI.Image>().fl
+            NewFly.transform.eulerAngles = new Vector3(0,180,0);
         }
         m_ElapsedSpawnTime = 0;
     }
 
     class FlyHandAnimation : HandAnimation
     {
+
+        LordOfFlies m_Lord;
+
+        public override void Initialize()
+        {
+            base.Initialize();
+            AssociatedObject.transform.localPosition = m_HandStartPosition;
+        }
         public FlyHandAnimation(List<GameObject> Cards, OpponentScript Opponent) : base(Cards,Opponent)
         {
-
+            m_Lord = (LordOfFlies)Opponent;
+            m_HandStartPosition = new Vector3(0, 800);
         }
 
 
+        Vector3 m_HandStartPosition = new Vector3();
+        float m_HandGrabY = 400;
         float m_ToPositionTime = 2f;
         float m_WaitDelay = 0.5f;
+        float m_GrabSpeed = 300f;
 
-        //public override int Update()
-        //{
-        //
-        //}
+        float m_HandLastY = 300;
+
+
+        int m_CardToGrabIndex = 2;
+        float m_ElapsedGrabTime = 0;
+
+        bool m_InPosition = false;
+
+        float m_ElapsedLastWaitTime = 0;
+        public override int Update()
+        {
+            if(m_ElapsedGrabTime < m_ToPositionTime)
+            {
+                float Speed = (m_HandGrabY - m_HandStartPosition.y) / m_ToPositionTime;
+                AssociatedObject.transform.localPosition += new Vector3(0,Speed * Time.deltaTime);
+                p_UpdateCardPositions();
+            }
+            else if(m_ElapsedGrabTime < m_ToPositionTime+m_WaitDelay)
+            {
+                if(m_InPosition)
+                {
+                    if (m_Lord.m_FlyObjects.Count >= 3)
+                    {
+                        //take best card
+                        m_CardToGrabIndex = 1;//debug
+                    }
+                    else
+                    {
+                        m_GrabSpeed = 150f;
+                    }
+                }
+                m_InPosition = true;
+                //do nothing
+                p_UpdateCardPositions();
+            }
+            else
+            {
+                //move towards card, irregardless of player shenanigans
+                if(Mathf.Abs(AssociatedObject.transform.localPosition.y-m_HandLastY) < 1f)
+                {
+                    //wait
+                    m_ElapsedLastWaitTime += Time.deltaTime;
+                    if(m_ElapsedLastWaitTime >= 1)
+                    {
+                        return (m_CardToGrabIndex);
+                    }
+                }
+                else
+                {
+                    Vector3 TargetPosition = new Vector3(m_Cards[m_CardToGrabIndex].transform.localPosition.x, m_HandLastY);
+                    Vector3 Diff = TargetPosition - AssociatedObject.transform.localPosition;
+                    float Distance = Diff.magnitude;
+                    AssociatedObject.transform.position += Diff.normalized* Mathf.Min(m_GrabSpeed*Time.deltaTime,Distance);
+                }
+            }
+            m_ElapsedGrabTime += Time.deltaTime;
+            return (-1);
+        }
     }
 
-    public virtual HandAnimation GetHandAnimation(List<GameObject> Cards, OpponentScript Opponent)
+    public override HandAnimation GetHandAnimation(List<GameObject> Cards, OpponentScript Opponent)
     {
-        return (new HandAnimation(Cards, Opponent));
+        return (new FlyHandAnimation(Cards, Opponent));
     }
     float m_FlySpawnDelay = 2f;
 

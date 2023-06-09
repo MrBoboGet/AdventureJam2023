@@ -380,7 +380,7 @@ public class OpponentScript : MonoBehaviour
     public class HandAnimation
     {
         Camera m_Camera;
-        public void Initialize()
+        public virtual void Initialize()
         {
             m_EventSystem = FindObjectOfType<EventSystem>();
             m_Camera = FindObjectOfType<Camera>();
@@ -498,6 +498,43 @@ public class OpponentScript : MonoBehaviour
         float m_MoveDirection = 0;
 
         int m_SwitchCount = 0;
+
+
+
+        protected void p_UpdateCardPositions()
+        {
+            if (m_ElapsedMoveTime > m_MoveAwayDuration + m_MoveBackDuration + m_MoveAgainDelay)
+            {
+                if (Input.GetKeyDown(KeyCode.D))
+                {
+                    m_ElapsedMoveTime = 0;
+                    m_MoveDirection = 1;
+                }
+                else if (Input.GetKeyDown(KeyCode.A))
+                {
+                    m_ElapsedMoveTime = 0;
+                    m_MoveDirection = -1;
+                }
+            }
+            else if (m_ElapsedMoveTime < m_MoveAwayDuration)
+            {
+                //calculate speed
+                float Speed = m_MoveDistance / m_MoveAwayDuration;
+                foreach (GameObject Object in m_Cards)
+                {
+                    Object.transform.localPosition += new Vector3(Speed * m_MoveDirection, 0) * Time.deltaTime;
+                }
+            }
+            else if (m_ElapsedMoveTime < m_MoveAwayDuration + m_MoveBackDuration)
+            {
+                float Speed = m_MoveDistance / m_MoveBackDuration;
+                foreach (GameObject Object in m_Cards)
+                {
+                    Object.transform.localPosition -= new Vector3(Speed * m_MoveDirection, 0) * Time.deltaTime;
+                }
+            }
+            m_ElapsedMoveTime += Time.deltaTime;
+        }
         virtual public int Update()
         {
             if (AssociatedObject == null)
@@ -563,37 +600,7 @@ public class OpponentScript : MonoBehaviour
                     }
                 }
             }
-            if (m_ElapsedMoveTime > m_MoveAwayDuration + m_MoveBackDuration + m_MoveAgainDelay)
-            {
-                if (Input.GetKeyDown(KeyCode.D))
-                {
-                    m_ElapsedMoveTime = 0;
-                    m_MoveDirection = 1;
-                }
-                else if (Input.GetKeyDown(KeyCode.A))
-                {
-                    m_ElapsedMoveTime = 0;
-                    m_MoveDirection = -1;
-                }
-            }
-            else if (m_ElapsedMoveTime < m_MoveAwayDuration)
-            {
-                //calculate speed
-                float Speed = m_MoveDistance / m_MoveAwayDuration;
-                foreach (GameObject Object in m_Cards)
-                {
-                    Object.transform.localPosition += new Vector3(Speed * m_MoveDirection, 0) * Time.deltaTime;
-                }
-            }
-            else if (m_ElapsedMoveTime < m_MoveAwayDuration + m_MoveBackDuration)
-            {
-                float Speed = m_MoveDistance / m_MoveBackDuration;
-                foreach (GameObject Object in m_Cards)
-                {
-                    Object.transform.localPosition -= new Vector3(Speed * m_MoveDirection, 0) * Time.deltaTime;
-                }
-            }
-            m_ElapsedMoveTime += Time.deltaTime;
+            p_UpdateCardPositions();
             return (m_GrabbedCardIndex);
         }
     }
