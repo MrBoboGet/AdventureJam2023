@@ -22,8 +22,10 @@ public class OpponentScript : MonoBehaviour
     public CharacterAnimation WinSprite;
     public CharacterAnimation LoseSprite;
 
-    public TextAsset Dialog;
+    public TextAsset DialogText;
     public GameObject DialogObject;
+    public GameObject LoreDialog;
+
 
     GameObject m_EyeObject;
     Dictionary<string, List<string>> m_Dialog = new Dictionary<string, List<string>>();
@@ -81,12 +83,12 @@ public class OpponentScript : MonoBehaviour
 
         //initialize text
 
-        if(Dialog == null)
+        if(DialogText == null)
         {
             return;
         }
         string CurrentTag = "";
-        System.IO.StringReader Reader = new System.IO.StringReader(Dialog.text);
+        System.IO.StringReader Reader = new System.IO.StringReader(DialogText.text);
         while(true)
         {
             string Line = Reader.ReadLine();
@@ -380,6 +382,19 @@ public class OpponentScript : MonoBehaviour
     {
 
     }
+
+    public void DisplayDialog(string DialogID,System.Action ResultingAction)
+    {
+        //create dialog object with appropriate stufferino
+        GameObject DialogObject = Instantiate(LoreDialog);
+        Vector3 Position = DialogObject.transform.position;
+        DialogObject.transform.parent = m_AssociatedCanvas.transform;
+        DialogObject.transform.localPosition = Position;
+        Dialog AssociatedDialog = DialogObject.GetComponentInChildren<Dialog>();
+        AssociatedDialog.SetDoneAction(ResultingAction);
+        AssociatedDialog.TextBoxes = m_Dialog[DialogID];
+    }
+
     public virtual void LeavePickCard()
     {
 

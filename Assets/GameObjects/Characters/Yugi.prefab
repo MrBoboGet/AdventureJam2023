@@ -14,7 +14,7 @@ GameObject:
   - component: {fileID: -2777104538350487977}
   - component: {fileID: -4869692911232993787}
   m_Layer: 7
-  m_Name: LordOfFlies
+  m_Name: Yugi
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

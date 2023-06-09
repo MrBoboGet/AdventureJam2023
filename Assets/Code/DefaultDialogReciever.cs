@@ -4,11 +4,11 @@ using UnityEngine;
 using TMPro;
 public class DefaultDialogReciever : MonoBehaviour, TextReciever
 {
-    TMPro.TextMeshPro m_TextBox = null;
+    TMPro.TextMeshProUGUI m_TextBox = null;
     // Start is called before the first frame update
     void Start()
     {
-        m_TextBox = GetComponent<TMPro.TextMeshPro>();
+        m_TextBox = GetComponent<TMPro.TextMeshProUGUI>();
         foreach(Dialog Diag in GetComponents<Dialog>())
         {
             Diag.SetReciever(this);
