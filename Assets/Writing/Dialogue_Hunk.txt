@@ -28,7 +28,7 @@
 "Ops, hehe."
 
 #Fold
-"I think I'll sit this one out"
+"I think I'll sit this one out."
 
 #Raise
 "Just a bit more..."
@@ -36,9 +36,9 @@
 "I'm really feeling this hand!"
 
 #Match
-"Ooh! Let's compare!"
+"Slow and steady wins the race!"
 
-"Just like armwrestling! Kind of, hehe."
+"Ou! Let's compare!"
 
 #Call
 "This is it!"
@@ -55,7 +55,7 @@
 "Phew! It's my loss...
 
 #RoundWin
-"Excercising the brain is also important."
+"I see! Excercising the brain is also important!"
 
 #OpponentRaise
 "O-oooh...!"
@@ -64,12 +64,12 @@
 "Aww, it was just getting good..."
 
 #OpponentFold
-"T-there's always next time!"
+"W-well, there's always next time...!"
 
 #Hunkwalla
 "UWOOOOOOOO!!!"
 
-"LET'S MACHO!!!"
+"LET'S!!! MACHO!!!"
 
 "MUSCLE IS LIFE!!!"
 
@@ -84,3 +84,26 @@
 "LET'S SEE THOSE MUSCLES FLEX!!!"
 
 "COME ON!!! PUMP THOSE MUSCLES!!!"
+
+#HunkwallaFold
+"HRNNNNG!!! NEXT!!!"
+
+#HunkwallaRaise
+"PUSH IT TO THE LIMIT!!!"
+
+"AMP!!! IT!!! UP!!!"
+
+#HunkwallaMatch
+"I'LL MATCH YOUR PACE, NO PROBLEM!!!"
+
+#HunkwallaCall
+"SHOW ME WHAT YOU GOT!!!"
+
+#HunkwallaOpponentRaise
+"THAT'S THE SPIRIT!!!"
+
+#HunkwallaOpponentCall
+"HRNNNNNNNGGGGG!!!"
+
+#HunkwallaOpponentFold
+"UUUUUOOOOOOOO!!!"
