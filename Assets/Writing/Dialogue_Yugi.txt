@@ -2,7 +2,7 @@
 "hmmm"
 
 #Win
-"You fought well."
+"Stand up, a champion shouldn't be on his knees."
 
 #Lose
 "If there is the will, then there is hope."
@@ -14,16 +14,16 @@
 "If you worship something enough, random chance suddenly becomes the will of all-powerful, supernatural forces."
 
 #Match
-"It's timke to match."
+"It's time to m-m-m-match!"
 
 #Call
-"It's time to duel."
+"It's time to d-d-d-duel!"
 
 #1
-"I believe in the heart of the cards."
+"I believe in the heart of the cards!"
 
 #2
-"Ready or not, Spirit, this is where you take over."
+"Ready or not, Spirit, this is where you take over!"
 
 #3
 "It’s not always about being number one. It’s about dueling with bravery, honor, and respect! And most importantly, putting the needs of others ahead of your own!"
@@ -35,7 +35,7 @@
 "My hand has no pathethic cards!"
 
 #OpponentCall
-"My hand has no pathethic cards!"
+"I'll face you head on!"
 
 #OpponentFold
-"It's time to fold."
+"It's time to f-f-f-fold."
