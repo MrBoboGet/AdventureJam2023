@@ -46,23 +46,34 @@
 "Shall we continue?"
 
 #Fold
+"A wise man knows when to cut his losses."
 
 #Raise
+"Well, what do you say we up the stakes a bit then, hmm?" 
 
 #Match
+"Very well, let us compare hands then."
 
 #Call
+"I believe this should be a good point to stop."
 
 #1
+"...No matter, let us proceed."
 
 #2
+"...Still under control."
 
 #3
+"...It is my loss."
 
 #RoundWin
+"Another round, my friend?"
 
 #OpponentRaise
+"Hmmm... Slightly worrying..."
 
 #OpponentCall
+"Oh?"
 
 #OpponentFold
+"A wise decision."
