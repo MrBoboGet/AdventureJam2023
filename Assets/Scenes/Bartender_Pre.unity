@@ -591,8 +591,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d96bec2b2c87583428526d416a1a3464, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  NextScene: Assets/Scenes/Trench_Pre.unity
-  Text: {fileID: 4900000, guid: dbe34da707310374c894e2061a0e058a, type: 3}
+  NextScene: Assets/Scenes/Bartender_Battle.unity
+  Text: {fileID: 4900000, guid: f80507688c8161b458a8dbd619b5d6b6, type: 3}
 --- !u!212 &2097501462
 SpriteRenderer:
   m_ObjectHideFlags: 0

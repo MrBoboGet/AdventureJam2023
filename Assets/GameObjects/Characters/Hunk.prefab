@@ -11,8 +11,8 @@ GameObject:
   - component: {fileID: 1392094826569702263}
   - component: {fileID: 1392094826569702262}
   - component: {fileID: 1392094826569702260}
-  - component: {fileID: 1392094826569702261}
   - component: {fileID: 1392094826569702267}
+  - component: {fileID: 8545289}
   m_Layer: 7
   m_Name: Hunk
   m_TagString: Untagged
@@ -27,7 +27,7 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1392094826569702257}
-  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 1.95, z: 0}
   m_LocalScale: {x: 0.28, y: 0.28, z: 0.6742569}
   m_ConstrainProportionsScale: 0
@@ -113,36 +113,6 @@ BoxCollider2D:
   serializedVersion: 2
   m_Size: {x: 11.91, y: 16.84}
   m_EdgeRadius: 0
---- !u!114 &1392094826569702261
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1392094826569702257}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 24906312f542fb64bbe10434c8b3286c, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  Transitions:
-    BattleScene: Assets/Scenes/Hunk_Battle.unity
-    LoseScene: Assets/Scenes/Lose.unity
-    NextScene: Assets/Scenes/Hunk_Post.unity
-  EyeRadius: 0.13
-  NeutralSprite: {fileID: 21300000, guid: 8686237a43beb5f469bbd5797ff60329, type: 3}
-  WhiteEye: {fileID: 21300000, guid: 7921317a3f80b0143ac4227f6c1c4937, type: 3}
-  EyeSprite: {fileID: 21300000, guid: bae189a503aab7a4794202505fbd9265, type: 3}
-  TellSprite: {fileID: 21300000, guid: 8686237a43beb5f469bbd5797ff60329, type: 3}
-  WinSprite:
-    SpriteAnimation: {fileID: 21300000, guid: 49f28772391e11346aa982a882fe3ce3, type: 3}
-    Clip: 
-  LoseSprite:
-    SpriteAnimation: {fileID: 21300000, guid: cf3b80222ce77e34083969361879654a, type: 3}
-    Clip: 
-  DialogText: {fileID: 4900000, guid: ce8ba4ef71eda134898ae52d5730c5a4, type: 3}
-  DialogObject: {fileID: 5145691382794934176, guid: fada6ad3bec7d004f936d976a560caba, type: 3}
-  LoreDialog: {fileID: 8032961317910320448, guid: f4ae4d29dd8938c43aaa2791c254bf29, type: 3}
 --- !u!95 &1392094826569702267
 Animator:
   serializedVersion: 4
@@ -163,3 +133,39 @@ Animator:
   m_HasTransformHierarchy: 1
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorControllerStateOnDisable: 0
+--- !u!114 &8545289
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1392094826569702257}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 10139ac9922104b4eb1832cb719c516d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Transitions:
+    BattleScene: Assets/Scenes/Hunk_Battle.unity
+    LoseScene: Assets/Scenes/Lose.unity
+    NextScene: Assets/Scenes/Hunk_Post.unity
+  EyeRadius: 0.13
+  NeutralSprite: {fileID: 21300000, guid: 8686237a43beb5f469bbd5797ff60329, type: 3}
+  WhiteEye: {fileID: 21300000, guid: 7921317a3f80b0143ac4227f6c1c4937, type: 3}
+  EyeSprite: {fileID: 21300000, guid: bae189a503aab7a4794202505fbd9265, type: 3}
+  TellSprite: {fileID: 21300000, guid: 8686237a43beb5f469bbd5797ff60329, type: 3}
+  WinSprite:
+    SpriteAnimation: {fileID: 21300000, guid: 49f28772391e11346aa982a882fe3ce3, type: 3}
+    Clip: 
+  LoseSprite:
+    SpriteAnimation: {fileID: 21300000, guid: cf3b80222ce77e34083969361879654a, type: 3}
+    Clip: 
+  DialogText: {fileID: 4900000, guid: ce8ba4ef71eda134898ae52d5730c5a4, type: 3}
+  DialogObject: {fileID: 5145691382794934176, guid: fada6ad3bec7d004f936d976a560caba, type: 3}
+  LoreDialog: {fileID: 8032961317910320448, guid: f4ae4d29dd8938c43aaa2791c254bf29, type: 3}
+  FlexSprites:
+  - {fileID: 21300000, guid: de5a5fd102ae6a84c9bd3f1f7eec0312, type: 3}
+  - {fileID: 21300000, guid: 87c192dfcfd0cd047ba2e52931bf2a88, type: 3}
+  - {fileID: 21300000, guid: be5478f190919454c910d223b0353501, type: 3}
+  ParticleEmitter: {fileID: 7271078178542542779, guid: 562fe88f44b857148a0548c86ad5751d, type: 3}
+  FlexDelay: 0.333

@@ -16,14 +16,16 @@ public class Stress : MonoBehaviour
     int m_TotalLevels = 3;
     float m_BaseTime = 5f;
     float m_MaxTime = 2f;
+    bool m_Locked = false;
 
     int m_StressLevel = 0;
 
     TimerScript m_AssociatedTimer;
     public void IncreaseStress()
     {
+        if (m_Locked) return;
         m_StressLevel += 1;
-        if(m_StressLevel > m_TotalLevels)
+        if (m_StressLevel > m_TotalLevels)
         {
             m_StressLevel = m_TotalLevels;
         }
@@ -35,6 +37,7 @@ public class Stress : MonoBehaviour
     }
     public void DecreaseStress()
     {
+        if (m_Locked) return;
         m_StressLevel -= 1;
         if (m_StressLevel > m_TotalLevels)
         {
@@ -45,6 +48,24 @@ public class Stress : MonoBehaviour
         {
             m_SpriteRenderer.sprite = StressSprites[m_StressLevel];
         }
+    }
+
+    public void ResetStress()
+    {
+
+    }
+    public void LockMaxStress()
+    {
+        m_StressLevel = m_TotalLevels;
+        if (StressSprites != null)
+        {
+            m_SpriteRenderer.sprite = StressSprites[m_StressLevel];
+        }
+        m_Locked = true;
+    }
+    public void UnlockStress()
+    {
+        m_Locked = false;
     }
 
     // Update is called once per frame

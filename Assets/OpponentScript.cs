@@ -36,14 +36,14 @@ public class OpponentScript : MonoBehaviour
 
     float ChangeDuration = 4f;
 
-    bool m_InAnimation = false;
+    protected bool m_InAnimation = false;
 
     Canvas m_AssociatedCanvas;
 
 
     GameObject m_DialogObject;
 
-    public bool InAnimation()
+    virtual public bool InAnimation()
     {
         return (m_InAnimation);
     }

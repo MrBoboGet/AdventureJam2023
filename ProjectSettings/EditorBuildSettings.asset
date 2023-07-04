@@ -5,7 +5,61 @@ EditorBuildSettings:
   m_ObjectHideFlags: 0
   serializedVersion: 2
   m_Scenes:
+  - enabled: 0
+    path: 
+    guid: 00000000000000000000000000000000
+  - enabled: 1
+    path: Assets/Scenes/Yugi_Pre.unity
+    guid: 960647f20bb83704ba1d14301a040e8b
+  - enabled: 1
+    path: Assets/Scenes/Yugi_Post.unity
+    guid: 9150af7a716863f4a95a5f6281766bb6
+  - enabled: 1
+    path: Assets/Scenes/Yugi_Battle.unity
+    guid: e4533adad1c17614f83af4261c35bfe1
   - enabled: 1
     path: Assets/Scenes/Trench_Pre.unity
-    guid: 2cda990e2423bbf4892e6590ba056729
+    guid: 2d5c26405accc884b959cff49c037b34
+  - enabled: 1
+    path: Assets/Scenes/Trench_Post.unity
+    guid: 52490848c072bbf44982fa74524f8576
+  - enabled: 1
+    path: Assets/Scenes/Trench_Battle.unity
+    guid: 5c97af1cfbb2d164fa3751e0e163405b
+  - enabled: 1
+    path: Assets/Scenes/StartScene.unity
+    guid: c9b556b38e9fcfa49ba53ca76c022ddc
+  - enabled: 1
+    path: Assets/Scenes/New Scene.unity
+    guid: 01dd174ec11bfed45a51edd71d762c00
+  - enabled: 1
+    path: Assets/Scenes/Lose.unity
+    guid: 0f6e03cb774fb824ea89752f8b70627b
+  - enabled: 1
+    path: Assets/Scenes/Hunk_Pre.unity
+    guid: 24e0abd4fe88c7346b76833ed4d2e34d
+  - enabled: 1
+    path: Assets/Scenes/Hunk_Post.unity
+    guid: 060d3134967b35d41baf1af9a7cf1efa
+  - enabled: 1
+    path: Assets/Scenes/Hunk_Battle.unity
+    guid: 794713854b1dcbc49b070b354c21e5b5
+  - enabled: 1
+    path: Assets/Scenes/Lord_Pre.unity
+    guid: 676736c08e7cfd84fab482d2a132e20a
+  - enabled: 1
+    path: Assets/Scenes/Lord_Post.unity
+    guid: 9e6d42a093c8e4a4193243af4c03feed
+  - enabled: 1
+    path: Assets/Scenes/Bartender_Pre.unity
+    guid: 38a375073f900364f93e7575c5b74d6f
+  - enabled: 1
+    path: Assets/Scenes/Lord_Battle.unity
+    guid: f1df5caa0c7c48448974eee8935b9bef
+  - enabled: 1
+    path: Assets/Scenes/Bartender_Post.unity
+    guid: c818da6e62aba12499871655312f245b
+  - enabled: 1
+    path: Assets/Scenes/Bartender_Battle.unity
+    guid: 0d17cc880e25eb947a33848f2f09e231
   m_configObjects: {}
