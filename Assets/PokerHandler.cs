@@ -749,7 +749,7 @@ public class PokerHandler : MonoBehaviour
 
     public void OnPass()
     {
-        if(!m_CurrentPokerState.PlayerTurn)
+        if(!m_CurrentPokerState.PlayerTurn || m_CurrentPokerState.Call)
         {
             Oof();
             return;

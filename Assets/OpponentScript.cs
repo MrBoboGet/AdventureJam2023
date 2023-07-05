@@ -128,7 +128,7 @@ public class OpponentScript : MonoBehaviour
             m_EyeObject.transform.localPosition = EyeDirection.normalized * EyeRadius;
         }
     }
-    public void HoverEnter(int CardIndex)
+    virtual public void HoverEnter(int CardIndex)
     {
         if(CardIndex == 2)
         {
@@ -149,26 +149,33 @@ public class OpponentScript : MonoBehaviour
         p_DisplayDialogCategory("Whatever");
     }
 
-    public void HoverLeave()
+    virtual public void HoverLeave()
     {
         GetComponent<SpriteRenderer>().sprite = NeutralSprite;
     }
-
+    protected bool m_SpriteLock = false;
     IEnumerator p_ChangeSprite(string NewSprite, float Duration)
     {
         m_InAnimation = true;
         Sprite PreviousSprite = GetComponent<SpriteRenderer>().sprite;
         Animator AssociatedAnimator = GetComponent<Animator>();
-        AssociatedAnimator.enabled = true;
-        AssociatedAnimator.Play("Base Layer."+NewSprite);
+        if (!m_SpriteLock)
+        {
+            AssociatedAnimator.enabled = true;
+            AssociatedAnimator.Play("Base Layer." + NewSprite);
+
+        }
         float ElapsedDuration = 0;
         while (ElapsedDuration < Duration)
         {
             ElapsedDuration += Time.deltaTime;
             yield return null;
         }
-        AssociatedAnimator.enabled = false;
-        GetComponent<SpriteRenderer>().sprite = PreviousSprite;
+        if(!m_SpriteLock)
+        {
+            AssociatedAnimator.enabled = false;
+            GetComponent<SpriteRenderer>().sprite = PreviousSprite;
+        }
         m_InAnimation = false;
     }
     IEnumerator p_ChangeSprite(CharacterAnimation Animation,float Duration)
@@ -188,14 +195,20 @@ public class OpponentScript : MonoBehaviour
     {
         m_InAnimation = true;
         Sprite OldSprite = GetComponent<SpriteRenderer>().sprite;
-        GetComponent<SpriteRenderer>().sprite = NewSprite;
+        if(!m_SpriteLock)
+        {
+            GetComponent<SpriteRenderer>().sprite = NewSprite;
+        }
         float ElapsedDuration = 0;
         while(ElapsedDuration < Duration)
         {
             ElapsedDuration += Time.deltaTime;
             yield return null;
         }
-        GetComponent<SpriteRenderer>().sprite = OldSprite;
+        if(!m_SpriteLock)
+        {
+            GetComponent<SpriteRenderer>().sprite = OldSprite;
+        }
         m_InAnimation = false;
     }
     int m_DialogCount = 0;
@@ -363,8 +376,10 @@ public class OpponentScript : MonoBehaviour
         //create dialog object with appropriate stufferino
         GameObject DialogObject = Instantiate(LoreDialog);
         Vector3 Position = DialogObject.transform.position;
+        Vector3 Scale = DialogObject.transform.localScale;
         DialogObject.transform.parent = m_AssociatedCanvas.transform;
         DialogObject.transform.localPosition = Position;
+        DialogObject.transform.localScale = Scale;
         Dialog AssociatedDialog = DialogObject.GetComponentInChildren<Dialog>();
         AssociatedDialog.SetDoneAction(ResultingAction);
         AssociatedDialog.TextBoxes = m_Dialog[DialogID];

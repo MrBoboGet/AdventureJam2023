@@ -40,6 +40,23 @@ public class Hunk : OpponentScript
         GameObject Emitter = Instantiate(ParticleEmitter);
         Emitter.transform.position = gameObject.transform.position;
         FindObjectOfType<Stress>().LockMaxStress();
+        m_SpriteLock = true;
+    }
+
+
+    public override void HoverEnter(int CardIndex)
+    {
+        if(!m_Flexing)
+        {
+            base.HoverEnter(CardIndex);
+        }
+    }
+    public override void HoverLeave()
+    {
+        if (!m_Flexing)
+        {
+            base.HoverLeave();
+        }
     }
     void Start()
     {
