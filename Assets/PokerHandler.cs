@@ -323,7 +323,7 @@ public class PokerHandler : MonoBehaviour
         }
     }
 
-    enum PokerHand
+    public enum HandType
     {
         Null,
         Pair,
@@ -333,9 +333,43 @@ public class PokerHandler : MonoBehaviour
         Flush,
         FullHouse,
         FourOfAKind
-        
     }
-    int PairCount(List<Card> Hand,int TargetCount)
+    public class PokerHand
+    {
+        public HandType Type;
+        public int TypeStrength = 0;
+        public int HighestCard = 0;
+
+        public int CompareTo(PokerHand OtherHand)
+        {
+            if(Type.CompareTo(OtherHand.Type) < 0)
+            {
+                return -1;
+            }
+            else if(Type.CompareTo(OtherHand.Type)  > 0)
+            {
+                return 1;
+            }
+            if (TypeStrength.CompareTo(OtherHand.TypeStrength) < 0)
+            {
+                return -1;
+            }
+            else if (TypeStrength.CompareTo(OtherHand.TypeStrength) > 0)
+            {
+                return 1;
+            }
+            if (HighestCard.CompareTo(OtherHand.HighestCard) < 0)
+            {
+                return -1;
+            }
+            else if (HighestCard.CompareTo(OtherHand.HighestCard) > 0)
+            {
+                return 1;
+            }
+            return 0;
+        }
+    }
+    public static int PairCount(List<Card> Hand,int TargetCount)
     {
         int ReturnValue = 0;
         List<int> CountMap = new List<int>();
@@ -356,19 +390,50 @@ public class PokerHandler : MonoBehaviour
         }
         return(ReturnValue);
     }
-    bool HasPair(List<Card> Hand)
+    public static int HighestPairValue(List<Card> Hand,int PairCount)
+    {
+        int ReturnValue = 0;
+        List<int> CountMap = new List<int>();
+        for (int i = 0; i < 13; i++)
+        {
+            CountMap.Add(0);
+        }
+        foreach (Card CurrentCard in Hand)
+        {
+            CountMap[CurrentCard.Value - 1] += 1;
+        }
+        int HighestPair = -1;
+        for(int i = 0; i < CountMap.Count;i++)
+        {
+            if(CountMap[i] == PairCount)
+            {
+                if (HighestPair != 0 && i > HighestPair)
+                {
+                    HighestPair = i;
+                }
+            }
+        }
+        ReturnValue = HighestPair;
+        if(HighestPair == 0)
+        {
+            ReturnValue = 14;
+        }
+        return (ReturnValue);
+
+    }
+    public static bool HasPair(List<Card> Hand)
     {
         return (PairCount(Hand, 2) == 1);
     }
-    bool HasTwoPair(List<Card> Hand)
+    public static bool HasTwoPair(List<Card> Hand)
     {
         return (PairCount(Hand, 2) == 2);
     }
-    bool HasTriss(List<Card> Hand)
+    public static bool HasTriss(List<Card> Hand)
     {
         return (PairCount(Hand,3) == 1);
     }
-    bool HasFlush(List<Card> Hand)
+    public static bool HasFlush(List<Card> Hand)
     {
         bool ReturnValue = true;
         CardType TargetType = Hand[0].Type;
@@ -382,11 +447,11 @@ public class PokerHandler : MonoBehaviour
         }
         return (ReturnValue);
     }
-    bool HasFourOfAKind(List<Card> Hand)
+    public static bool HasFourOfAKind(List<Card> Hand)
     {
         return (PairCount(Hand, 4) == 1);
     }
-    bool HasStraight(List<Card> Hand)
+    public static bool HasStraight(List<Card> Hand)
     {
         bool ReturnValue = true;
         List<Card> HandCopy = new List<Card>(Hand);
@@ -402,37 +467,45 @@ public class PokerHandler : MonoBehaviour
         return (ReturnValue);
     }
         
-    PokerHand GetHand(List<Card> Hand)
+    public static PokerHand GetHand(List<Card> Hand)
     {
-        PokerHand ReturnValue = PokerHand.Null;
+        PokerHand ReturnValue = new PokerHand();
         if(HasPair(Hand))
         {
-            ReturnValue = PokerHand.Pair;
+            ReturnValue.Type = HandType.Pair;
+            ReturnValue.TypeStrength = HighestPairValue(Hand, 2);
         }
         if(HasTwoPair(Hand))
         {
-            ReturnValue = PokerHand.TwoPair;
+            ReturnValue.Type = HandType.TwoPair;
+            ReturnValue.TypeStrength = HighestPairValue(Hand, 2);
         }
         if(HasTriss(Hand))
         {
-            ReturnValue = PokerHand.Triss;
+            ReturnValue.Type = HandType.Triss;
+            ReturnValue.TypeStrength = HighestPairValue(Hand, 3);
         }
         if(HasPair(Hand) && HasTriss(Hand))
         {
-            ReturnValue = PokerHand.FullHouse;
+            ReturnValue.Type = HandType.FullHouse;
+            ReturnValue.TypeStrength = HighestPairValue(Hand, 3);
         }
         if(HasFlush(Hand))
         {
-            ReturnValue = PokerHand.Flush;
+            ReturnValue.Type = HandType.Flush;
+            ReturnValue.TypeStrength = Hand.Max(x => x.Value); 
         }
         if(HasStraight(Hand))
         {
-            ReturnValue = PokerHand.Straight;
+            ReturnValue.Type = HandType.Straight;
+            ReturnValue.TypeStrength = Hand.Max(x => x.Value);
         }
         if(HasFourOfAKind(Hand))
         {
-            ReturnValue = PokerHand.FourOfAKind;
+            ReturnValue.Type = HandType.FourOfAKind;
+            ReturnValue.TypeStrength = HighestPairValue(Hand, 4);
         }
+        ReturnValue.HighestCard = Hand.Max(x => x.Value);
         return (ReturnValue);
     }
 
@@ -574,6 +647,7 @@ public class PokerHandler : MonoBehaviour
     Stress m_StressObject;
     void Start()
     {
+        m_Table = FindObjectOfType<Table>();
         m_OpponentObject = FindObjectOfType<OpponentScript>();
         Transitions = m_OpponentObject.Transitions;
         GlobalTransitionInfo.BattleScene = Transitions.BattleScene;
@@ -661,6 +735,7 @@ public class PokerHandler : MonoBehaviour
         {
             //AssociatedCard.ResetPosition();
             //print("Opponent");
+            m_OpponentObject.SetCurrentHand(m_CurrentPokerState.OpponentHand);
             AssociatedCard.ResetPosition();
             m_ReplacedCardIndex = AssociatedCard.CardIndex;
             m_PickHandler = new PickHandler();
@@ -706,7 +781,7 @@ public class PokerHandler : MonoBehaviour
     }
 
 
-
+    Table m_Table;
 
     void p_UpdatePot()
     {
@@ -880,7 +955,9 @@ public class PokerHandler : MonoBehaviour
                     int CardToDiscard = Random.Range(0, m_HandObjects.Count);
                     //random target location
                     Vector2 Origin = new Vector2(0, -5);
-                    Vector2 Destination = new Vector2(Random.Range(-6.5f, 6.5f), Random.Range(-4, -2));
+                    float TableCenter = -4f;
+                    Vector2 Destination = new Vector2(Random.Range(-m_Table.GetDimensions().x/2, m_Table.GetDimensions().x / 2), Random.Range(TableCenter - m_Table.GetDimensions().y/2, 
+                        TableCenter + m_Table.GetDimensions().y/2));
                     Sprite CardSprite = m_HandObjects[CardToDiscard].GetComponent<UnityEngine.UI.Image>().sprite;
                     StartCoroutine(p_ThrowCard(Origin, Destination, CardSprite));
                     DrawCard(CardToDiscard);
@@ -957,6 +1034,7 @@ public class PokerHandler : MonoBehaviour
                 m_CurrentOpponentState.ElapsedThink += Time.deltaTime;
                 if(m_CurrentOpponentState.ElapsedThink >= m_CurrentOpponentState.ThinkTime)
                 {
+                    m_OpponentObject.SetCurrentHand(m_CurrentPokerState.OpponentHand);
                     //make move
                     Move NewMove = m_OpponentObject.MakeMove(m_CurrentPokerState);
                     m_CurrentPokerState.PlayerTurn = true;
@@ -1012,7 +1090,9 @@ public class PokerHandler : MonoBehaviour
                             {
                                 Vector2 Origin = new Vector2(0, 0);
                                 //random destination
-                                Vector2 Destination = new Vector2(Random.Range(-6.5f, 6.5f), Random.Range(-2, 0));
+                                float TableCenter = -4f;
+                                Vector2 Destination = new Vector2(Random.Range(-m_Table.GetDimensions().x / 2, m_Table.GetDimensions().x / 2), Random.Range(TableCenter - m_Table.GetDimensions().y / 2,
+                                    TableCenter + m_Table.GetDimensions().y / 2));
                                 Sprite AssociatedSprite = m_CurrentPokerState.AssociatedDeck.GetSprite(DiscardedCard);
                                 StartCoroutine(p_ThrowCard(Origin, Destination, AssociatedSprite));
                             }

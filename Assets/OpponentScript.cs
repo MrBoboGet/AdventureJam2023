@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.EventSystems;
+using System.Linq;
 
 [System.Serializable]
 public class CharacterAnimation
@@ -128,9 +129,125 @@ public class OpponentScript : MonoBehaviour
             m_EyeObject.transform.localPosition = EyeDirection.normalized * EyeRadius;
         }
     }
+    int p_GetPairCard(List<Card> Hand, int PairCount)
+    {
+        int ReturnValue = 0;
+        int PairValue = PokerHandler.HighestPairValue(Hand, PairCount);
+        for (int i = 0; i < Hand.Count; i++)
+        {
+            if (PairValue == Hand[i].Value)
+            {
+                ReturnValue = i;
+                break;
+            }
+        }
+        return ReturnValue;
+    }
+
+    int p_GetNonPairCard(List<Card> Hand, int PairCount)
+    {
+        int ReturnValue = 0;
+        int PairValue = PokerHandler.HighestPairValue(Hand, PairCount);
+        for (int i = 0; i < Hand.Count; i++)
+        {
+            if (PairValue != Hand[i].Value)
+            {
+                ReturnValue = i;
+                break;
+            }
+        }
+        return ReturnValue;
+    }
+    int p_GetWorstCardIndex(List<Card> Hand)
+    {
+        int ReturnValue = 0;
+        PokerHandler.PokerHand CurrentHand = PokerHandler.GetHand(Hand);
+        if (CurrentHand.Type == PokerHandler.HandType.Flush || CurrentHand.Type == PokerHandler.HandType.Straight
+            || CurrentHand.Type == PokerHandler.HandType.FullHouse)
+        {
+            return 3;
+        }
+        else if (CurrentHand.Type == PokerHandler.HandType.Triss)
+        {
+            ReturnValue = p_GetNonPairCard(Hand, 3);
+        }
+        else if (CurrentHand.Type == PokerHandler.HandType.FourOfAKind)
+        {
+            ReturnValue = p_GetNonPairCard(Hand, 4);
+        }
+        else if (CurrentHand.Type == PokerHandler.HandType.Pair)
+        {
+            ReturnValue = p_GetNonPairCard(Hand, 2);
+        }
+        else if (CurrentHand.Type == PokerHandler.HandType.TwoPair)
+        {
+            ReturnValue = p_GetNonPairCard(Hand, 2);
+        }
+        else
+        {
+            int CurrentMax = -1;
+            int MaxIndex = 0;
+            for (int i = 0; i < Hand.Count; i++)
+            {
+                if (Hand[i].Value > CurrentMax)
+                {
+                    MaxIndex = i;
+                    CurrentMax = Hand[i].Value;
+                }
+            }
+            ReturnValue = (MaxIndex + 1)%Hand.Count;
+        }
+        return ReturnValue;
+    }
+    int p_GetBestCardIndex(List<Card> Hand)
+    {
+        int ReturnValue = 0;
+        PokerHandler.PokerHand CurrentHand = PokerHandler.GetHand(Hand);
+        if(CurrentHand.Type == PokerHandler.HandType.Flush || CurrentHand.Type == PokerHandler.HandType.Straight
+            || CurrentHand.Type == PokerHandler.HandType.FullHouse)
+        {
+            return 3;
+        }
+        else if(CurrentHand.Type == PokerHandler.HandType.Triss)
+        {
+            ReturnValue = p_GetPairCard(Hand, 3);
+        }
+        else if (CurrentHand.Type == PokerHandler.HandType.FourOfAKind)
+        {
+            ReturnValue = p_GetPairCard(Hand, 4);
+        }
+        else if(CurrentHand.Type == PokerHandler.HandType.Pair)
+        {
+            ReturnValue = p_GetPairCard(Hand, 2);
+        }
+        else if (CurrentHand.Type == PokerHandler.HandType.TwoPair)
+        {
+            ReturnValue = p_GetPairCard(Hand, 2);
+        }
+        else
+        {
+            int CurrentMax = -1;
+            int MaxIndex = 0;
+            for(int i = 0; i < Hand.Count;i++)
+            {
+                if(Hand[i].Value > CurrentMax)
+                {
+                    MaxIndex = i;
+                    CurrentMax = Hand[i].Value;
+                }
+            }
+            ReturnValue = MaxIndex;
+        }
+        return ReturnValue;
+    }
+    public void SetCurrentHand(List<Card>  CurrentHand)
+    {
+        m_CurrentHand = CurrentHand;
+    }
+    List<Card> m_CurrentHand = new List<Card>();
     virtual public void HoverEnter(int CardIndex)
     {
-        if(CardIndex == 2)
+        if(CardIndex == p_GetBestCardIndex(m_CurrentHand))
         {
             GetComponent<SpriteRenderer>().sprite = TellSprite;
         }
@@ -331,16 +448,17 @@ public class OpponentScript : MonoBehaviour
             {
                 ReturnValue = new Move_StealCard();
             }
-            else if (RandomXD < 0.66f)
+            else if (RandomXD < 0.66f && CurrentState.TurnCount >= 4)
             {
                 ReturnValue = new Move_Call();
             }
             else if (RandomXD < 1)
             {
                 ReturnValue = new Move_DiscardCards();
+                int CardToDiscardIndex = p_GetWorstCardIndex(m_CurrentHand);
                 Move_DiscardCards CardsToDiscard = (Move_DiscardCards)ReturnValue;
-                Card CardToDiscard = CurrentState.OpponentHand[0];
-                CurrentState.OpponentHand[0] = CurrentState.AssociatedDeck.DrawCard();
+                Card CardToDiscard = CurrentState.OpponentHand[CardToDiscardIndex];
+                CurrentState.OpponentHand[CardToDiscardIndex] = CurrentState.AssociatedDeck.DrawCard();
                 CardsToDiscard.DiscardedCards.Add(CardToDiscard);
             }
         }
