@@ -2405,6 +2405,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: Yugi
       objectReference: {fileID: 0}
+    - target: {fileID: 1392094826569702261, guid: 451a3c190f98007459a79d2729c9fb06, type: 3}
+      propertyPath: Transitions.LoseScene
+      value: Assets/Scenes/Lose_Yugi.unity
+      objectReference: {fileID: 0}
     - target: {fileID: 1392094826569702263, guid: 451a3c190f98007459a79d2729c9fb06, type: 3}
       propertyPath: m_RootOrder
       value: 1

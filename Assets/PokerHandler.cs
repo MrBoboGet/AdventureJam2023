@@ -93,7 +93,7 @@ public class PokerHandler : MonoBehaviour
 
     RaiseMenu m_BettingMenu;
 
-    public TransitionInfo Transitions;
+    TransitionInfo Transitions;
     class PickHandler
     {
         public List<GameObject> ObjectsToArrange = new List<GameObject>();
@@ -210,6 +210,49 @@ public class PokerHandler : MonoBehaviour
         print("Oof");
     }
 
+
+    void p_NewLife(bool PlayerWon)
+    {
+        //check if anyone has negative hp
+        if (!PlayerWon)
+        {
+            m_PokerPaused = true;
+            FindObjectOfType<LifeContainer>().DecreasePlayerHP();
+            m_CurrentPokerState.PlayerHP -= 1;
+            m_CurrentPokerState.PlayerCash = 15;
+            m_CurrentPokerState.OpponentCash = 15;
+            if (m_CurrentPokerState.PlayerHP == 0)
+            {
+                //load loose scene
+                UnityEngine.SceneManagement.SceneManager.LoadScene(Transitions.LoseScene);
+            }
+            //initialize dialog, could be special state......................
+            m_OpponentObject.DisplayDialog("RoundWin", () =>
+            {
+                m_PokerPaused = false;
+                p_InitializeNewRound();
+            });
+        }
+        else
+        {
+            m_PokerPaused = true;
+            m_CurrentPokerState.OpponentHP -= 1;
+            m_CurrentPokerState.PlayerCash = 15;
+            m_CurrentPokerState.OpponentCash = 15;
+            m_OpponentObject.DisplayDialog("" + (3 - m_CurrentPokerState.OpponentHP), () =>
+            {
+                if (m_CurrentPokerState.OpponentHP == 0)
+                {
+                    //load loose scene
+                    UnityEngine.SceneManagement.SceneManager.LoadScene(Transitions.NextScene);
+                }
+                m_PokerPaused = false;
+                p_InitializeNewRound();
+            });
+            FindObjectOfType<LifeContainer>().DecreaseOpponentHP();
+        }
+    }
+
     IEnumerator p_WaitForAnimation() 
     {
         int t = 0;
@@ -234,49 +277,15 @@ public class PokerHandler : MonoBehaviour
             DrawCard(i);
             m_CurrentPokerState.OpponentHand[i] = m_CurrentPokerState.AssociatedDeck.DrawCard(); 
         }
-
+        if (m_CurrentPokerState.PlayerCash < 0)
+        {
+            p_NewLife(false);
+        }
+        else if (m_CurrentPokerState.OpponentCash < 0)
+        {
+            p_NewLife(true);
+        }
         m_PokerPaused = false;
-
-        //check if anyone has negative hp
-        if(m_CurrentPokerState.PlayerCash < 0)
-        {
-            m_PokerPaused = true;
-            FindObjectOfType<LifeContainer>().DecreasePlayerHP();
-            m_CurrentPokerState.PlayerHP -= 1;
-            m_CurrentPokerState.PlayerCash = 15;
-            m_CurrentPokerState.OpponentCash = 15;
-            if(m_CurrentPokerState.PlayerHP == 0)
-            {
-                //load loose scene
-                UnityEngine.SceneManagement.SceneManager.LoadScene(Transitions.LoseScene);
-            }
-            //initialize dialog, could be special state......................
-            m_OpponentObject.DisplayDialog("RoundWin", () =>
-             {
-                 m_PokerPaused = false;
-                 p_InitializeNewRound();
-             });
-        }
-        else if(m_CurrentPokerState.OpponentCash < 0)
-        {
-            m_PokerPaused = true;
-            m_CurrentPokerState.OpponentHP -= 1;
-            m_CurrentPokerState.PlayerCash = 15;
-            m_CurrentPokerState.OpponentCash = 15;
-            m_OpponentObject.DisplayDialog(""+(3-m_CurrentPokerState.OpponentHP), () =>
-            {
-                if (m_CurrentPokerState.OpponentHP == 0)
-                {
-                    //load loose scene
-                    UnityEngine.SceneManagement.SceneManager.LoadScene(Transitions.NextScene);
-                }
-                m_PokerPaused = false;
-                p_InitializeNewRound(); 
-            });
-            FindObjectOfType<LifeContainer>().DecreaseOpponentHP();
-        }
-
-
     }
 
 
@@ -565,10 +574,11 @@ public class PokerHandler : MonoBehaviour
     Stress m_StressObject;
     void Start()
     {
+        m_OpponentObject = FindObjectOfType<OpponentScript>();
+        Transitions = m_OpponentObject.Transitions;
         GlobalTransitionInfo.BattleScene = Transitions.BattleScene;
         m_StressObject = FindObjectOfType<Stress>();
         m_Timer = FindObjectOfType<TimerScript>();
-        m_OpponentObject = FindObjectOfType<OpponentScript>();
         m_HandObjects = new List<GameObject>();
         for(int i = 0; i < 5;i++)
         {
@@ -831,7 +841,7 @@ public class PokerHandler : MonoBehaviour
         //DEBUG AFFFF
         if(Input.GetKeyDown(KeyCode.J))
         {
-            FindObjectOfType<LifeContainer>().DecreasePlayerHP();
+            p_NewLife(false);
         }
         if(Input.GetKeyDown(KeyCode.Space))
         {
@@ -840,7 +850,8 @@ public class PokerHandler : MonoBehaviour
         }
         if(Input.GetKeyDown(KeyCode.K))
         {
-            FindObjectOfType<LifeContainer>().DecreaseOpponentHP();
+            p_NewLife(true);
+            //FindObjectOfType<LifeContainer>().DecreaseOpponentHP();
         }
         //
 

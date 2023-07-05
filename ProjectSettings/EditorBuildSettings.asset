@@ -60,6 +60,9 @@ EditorBuildSettings:
     path: Assets/Scenes/Bartender_Post.unity
     guid: c818da6e62aba12499871655312f245b
   - enabled: 1
+    path: Assets/Scenes/Lose_Yugi.unity
+    guid: 4b34c11873b68744aa4eae875aa13e92
+  - enabled: 1
     path: Assets/Scenes/Bartender_Battle.unity
     guid: 0d17cc880e25eb947a33848f2f09e231
   m_configObjects: {}

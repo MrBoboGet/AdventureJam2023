@@ -136,13 +136,17 @@ public class OpponentScript : MonoBehaviour
         }
     }
 
+    virtual protected void p_DisplayDialogCategory(string CategoryName)
+    {
+        if (m_Dialog.ContainsKey(CategoryName))
+        {
+            p_DisplayDialog(m_Dialog[CategoryName], 2);
+        }
+    }
 
     public void OnThink()
     {
-        if (m_Dialog.ContainsKey("Whatever"))
-        {
-            p_DisplayDialog(m_Dialog["Whatever"],2);
-        }
+        p_DisplayDialogCategory("Whatever");
     }
 
     public void HoverLeave()
@@ -247,75 +251,45 @@ public class OpponentScript : MonoBehaviour
     public void OnWin()
     {
         StartCoroutine(p_ChangeSprite(WinSprite, ChangeDuration));
-        if(m_Dialog.ContainsKey("Win"))
-        {
-            p_DisplayDialog(m_Dialog["Win"]);
-        }
+        p_DisplayDialogCategory("Win");
     }
     public void OnLose()
     {
         StartCoroutine(p_ChangeSprite(LoseSprite, ChangeDuration));
-        if (m_Dialog.ContainsKey("Lose"))
-        {
-            p_DisplayDialog(m_Dialog["Lose"]);
-        }
+        p_DisplayDialogCategory("Lose");
     }
 
     public void OnCall()
     {
-        if (m_Dialog.ContainsKey("Call"))
-        {
-            p_DisplayDialog(m_Dialog["Call"]);
-        }
+        p_DisplayDialogCategory("Call");
     }
     public void OnFold()
     {
-        if (m_Dialog.ContainsKey("Fold"))
-        {
-            p_DisplayDialog(m_Dialog["Fold"]);
-        }
+        p_DisplayDialogCategory("Fold");
     }
     public void OnOpponentCall()
     {
-        if (m_Dialog.ContainsKey("OpponentCall"))
-        {
-            p_DisplayDialog(m_Dialog["OpponentCall"]);
-        }
+        p_DisplayDialogCategory("OpponentCall");
     }
     public void OnOpponentFold()
     {
-        if (m_Dialog.ContainsKey("OpponentFold"))
-        {
-            p_DisplayDialog(m_Dialog["OpponentFold"]);
-        }
+        p_DisplayDialogCategory("OpponentFold");
     }
     public void OnRaise()
     {
-        if (m_Dialog.ContainsKey("Raise"))
-        {
-            p_DisplayDialog(m_Dialog["Raise"]);
-        }
+        p_DisplayDialogCategory("Raise");
     }
     public void OnOpponentRaise()
     {
-        if (m_Dialog.ContainsKey("OpponentRaise"))
-        {
-            p_DisplayDialog(m_Dialog["OpponentRaise"]);
-        }
+        p_DisplayDialogCategory("OpponentRaise");
     }
     public void OnMatch()
     {
-        if (m_Dialog.ContainsKey("Match"))
-        {
-            p_DisplayDialog(m_Dialog["Match"]);
-        }
+        p_DisplayDialogCategory("Match");
     }
     public void OnOpponentMatch()
     {
-        if (m_Dialog.ContainsKey("OpponentMatch"))
-        {
-            p_DisplayDialog(m_Dialog["OpponentMatch"]);
-        }
+        p_DisplayDialogCategory("OpponentMatch");
     }
 
     virtual public Move MakeMove(PokerState CurrentState)
@@ -384,7 +358,7 @@ public class OpponentScript : MonoBehaviour
 
     }
 
-    public void DisplayDialog(string DialogID,System.Action ResultingAction)
+    virtual public void DisplayDialog(string DialogID,System.Action ResultingAction)
     {
         //create dialog object with appropriate stufferino
         GameObject DialogObject = Instantiate(LoreDialog);

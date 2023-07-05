@@ -13,6 +13,25 @@ public class Hunk : OpponentScript
 
 
 
+    protected override void p_DisplayDialogCategory(string CategoryName)
+    {
+        if(m_Flexing)
+        {
+            base.p_DisplayDialogCategory("Hunkwalla" + CategoryName);
+        }
+        else
+        {
+            base.p_DisplayDialogCategory(CategoryName);
+        }
+    }
+    override  public void DisplayDialog(string DialogID, System.Action ResultingAction)
+    {
+        base.DisplayDialog(DialogID, ResultingAction);
+        if(DialogID == "2")
+        {
+            p_InitializeFlexSequence();
+        }
+    }
 
     void p_InitializeFlexSequence()
     {
