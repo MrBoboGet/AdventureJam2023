@@ -199,7 +199,7 @@ public class PokerHandler : MonoBehaviour
     Vector2 GetPosition(int CardIndex)
     {
         //return (new Vector2(-400 + CardIndex*200, -350));
-        return (new Vector2(-500 + CardIndex*250, -575));
+        return (new Vector2(-360 + CardIndex*180, -605));
     }
 
     
@@ -214,13 +214,14 @@ public class PokerHandler : MonoBehaviour
     void p_NewLife(bool PlayerWon)
     {
         //check if anyone has negative hp
+        m_CurrentPokerState.PlayerCash = 15;
+        m_PokerPaused = true;
+        m_CurrentPokerState.OpponentCash = 15;
+        p_UpdatePot();
         if (!PlayerWon)
         {
-            m_PokerPaused = true;
             FindObjectOfType<LifeContainer>().DecreasePlayerHP();
             m_CurrentPokerState.PlayerHP -= 1;
-            m_CurrentPokerState.PlayerCash = 15;
-            m_CurrentPokerState.OpponentCash = 15;
             if (m_CurrentPokerState.PlayerHP == 0)
             {
                 //load loose scene
@@ -235,10 +236,7 @@ public class PokerHandler : MonoBehaviour
         }
         else
         {
-            m_PokerPaused = true;
             m_CurrentPokerState.OpponentHP -= 1;
-            m_CurrentPokerState.PlayerCash = 15;
-            m_CurrentPokerState.OpponentCash = 15;
             m_OpponentObject.DisplayDialog("" + (3 - m_CurrentPokerState.OpponentHP), () =>
             {
                 if (m_CurrentPokerState.OpponentHP == 0)
@@ -409,15 +407,11 @@ public class PokerHandler : MonoBehaviour
             {
                 if (HighestPair != 0 && i > HighestPair)
                 {
-                    HighestPair = i;
+                    HighestPair = i+1;
                 }
             }
         }
         ReturnValue = HighestPair;
-        if(HighestPair == 0)
-        {
-            ReturnValue = 14;
-        }
         return (ReturnValue);
 
     }
@@ -586,14 +580,14 @@ public class PokerHandler : MonoBehaviour
         {
             GameObject PlayerCard = Instantiate(CardPrefab);
             PlayerCard.transform.parent = AssociatedCanvas.transform;
-            PlayerCard.transform.localPosition = new Vector2(-400 + i * 200, -500);
+            PlayerCard.transform.localPosition = new Vector2(-220 + i * 110, -500);
             CardScript AssociatedScript = PlayerCard.GetComponent<CardScript>();
             AssociatedScript.CardValue = m_AssociatedDeck.DrawCard();
             AssociatedScript.GetComponent<UnityEngine.UI.Image>().sprite = m_AssociatedDeck.GetSprite(m_CurrentPokerState.PlayerHand[i]);
 
             GameObject OpponentCard = Instantiate(CardPrefab);
             OpponentCard.transform.parent = AssociatedCanvas.transform;
-            OpponentCard.transform.localPosition = new Vector2(-400 + i * 200, 500);
+            OpponentCard.transform.localPosition = new Vector2(-220 + i * 110, 500);
             AssociatedScript = OpponentCard.GetComponent<CardScript>();
             AssociatedScript.CardValue = m_AssociatedDeck.DrawCard();
             AssociatedScript.GetComponent<UnityEngine.UI.Image>().sprite = m_AssociatedDeck.GetSprite(m_CurrentPokerState.OpponentHand[i]);
@@ -612,6 +606,7 @@ public class PokerHandler : MonoBehaviour
     }
     void p_PlayerWonRound()
     {
+        m_StressObject.ResetStress();
         m_CurrentPokerState.PlayerCash += m_CurrentPokerState.PlayerPot + m_CurrentPokerState.OpponentPot;
         m_CurrentPokerState.PlayerPot = 0;
         m_CurrentPokerState.OpponentPot = 0;
@@ -853,11 +848,13 @@ public class PokerHandler : MonoBehaviour
     {
         FindObjectOfType<Camera>().orthographicSize = 2;
         FindObjectOfType<Camera>().transform.position = new Vector3(0,3,-10);
+        m_OpponentObject.transform.position += new Vector3(0, m_OpponentObject.YZoomOffset);
     }
     void p_SetNormalCamera()
     {
         FindObjectOfType<Camera>().orthographicSize = 5;
         FindObjectOfType<Camera>().transform.position = new Vector3(0, 0,-10);
+        m_OpponentObject.transform.position -= new Vector3(0, m_OpponentObject.YZoomOffset);
     }
     void p_InitializeOpponentPick()
     {
@@ -879,7 +876,7 @@ public class PokerHandler : MonoBehaviour
             AssociatedScript.AssociatedHandler = this;
             CardObjects.Add(NewCard);
         }
-        m_OpponentPickHandler = m_OpponentObject.GetHandAnimation(CardObjects,m_OpponentObject);
+        m_OpponentPickHandler = m_OpponentObject.GetHandAnimation(m_CurrentPokerState,CardObjects,m_OpponentObject);
         m_OpponentObject.EnterPickCard();
     }
 
@@ -1023,7 +1020,10 @@ public class PokerHandler : MonoBehaviour
                     if(Random.Range(0f,1f) < 0.4f)
                     {
                         //m_OpponentObject.OnThink();
-                        Delay(() => m_OpponentObject.OnThink(), 1);
+                        if(!m_CurrentPokerState.Call)
+                        {
+                            Delay(() => m_OpponentObject.OnThink(), 1);
+                        }
                         m_CurrentOpponentState.ThinkTime = 4f;
                     }
                     else

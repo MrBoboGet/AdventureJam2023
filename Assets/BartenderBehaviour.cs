@@ -16,7 +16,7 @@ public class BartenderBehaviour : OpponentScript
         
     }
 
-    public override HandAnimation GetHandAnimation(List<GameObject> Cards, OpponentScript Opponent)
+    public override HandAnimation GetHandAnimation(PokerState CurrentPokerState,List<GameObject> Cards, OpponentScript Opponent)
     {
         return (new HandAnimation(Cards, Opponent));
     }

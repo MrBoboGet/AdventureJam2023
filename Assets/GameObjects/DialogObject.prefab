@@ -56,7 +56,7 @@ MonoBehaviour:
   - "Det var en m\xF6rk och stormig natt"
   - Inga pengar, inga cases, inga bitches
   - Sedan, holy shieet
-  CharacterSpeed: 10
+  CharacterSpeed: 20
 --- !u!114 &-5669967701526438831
 MonoBehaviour:
   m_ObjectHideFlags: 0

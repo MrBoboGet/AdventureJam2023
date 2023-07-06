@@ -37,6 +37,8 @@ public class OpponentScript : MonoBehaviour
 
     float ChangeDuration = 4f;
 
+    public float YZoomOffset = 0;
+
     protected bool m_InAnimation = false;
 
     Canvas m_AssociatedCanvas;
@@ -158,7 +160,7 @@ public class OpponentScript : MonoBehaviour
         }
         return ReturnValue;
     }
-    int p_GetWorstCardIndex(List<Card> Hand)
+    protected int p_GetWorstCardIndex(List<Card> Hand)
     {
         int ReturnValue = 0;
         PokerHandler.PokerHand CurrentHand = PokerHandler.GetHand(Hand);
@@ -185,21 +187,21 @@ public class OpponentScript : MonoBehaviour
         }
         else
         {
-            int CurrentMax = -1;
-            int MaxIndex = 0;
+            int CurrentMin = 15;
+            int MinIndex = 0;
             for (int i = 0; i < Hand.Count; i++)
             {
-                if (Hand[i].Value > CurrentMax)
+                if (Hand[i].Value < CurrentMin && Hand[i].Value != 1)
                 {
-                    MaxIndex = i;
-                    CurrentMax = Hand[i].Value;
+                    MinIndex = i;
+                    CurrentMin = Hand[i].Value;
                 }
             }
-            ReturnValue = (MaxIndex + 1)%Hand.Count;
+            ReturnValue = MinIndex;
         }
         return ReturnValue;
     }
-    int p_GetBestCardIndex(List<Card> Hand)
+    protected int p_GetBestCardIndex(List<Card> Hand)
     {
         int ReturnValue = 0;
         PokerHandler.PokerHand CurrentHand = PokerHandler.GetHand(Hand);
@@ -480,7 +482,7 @@ public class OpponentScript : MonoBehaviour
         m_CoRoutines = NewRoutines;
     }
 
-    public virtual HandAnimation GetHandAnimation(List<GameObject> Cards, OpponentScript Opponent)
+    public virtual HandAnimation GetHandAnimation(PokerState CurrentPokerState,List<GameObject> Cards, OpponentScript Opponent)
     {
         return (new HandAnimation(Cards, Opponent));
     }
@@ -567,7 +569,7 @@ public class OpponentScript : MonoBehaviour
         float m_HoverSpeed = 2000f;
         float m_GrabDelay = 0.5f;
         float m_GrabSpeed = 3000f;
-        float m_GrabYLocation = 3f;
+        float m_GrabYLocation = 250;
         float m_ElapsedAnimation = 0;
 
         int m_MaxSwitchCount = -1;

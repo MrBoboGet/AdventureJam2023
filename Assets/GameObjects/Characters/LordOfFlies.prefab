@@ -65,6 +65,7 @@ MonoBehaviour:
   DialogText: {fileID: 4900000, guid: 18f0c9721c0e1254c951825710c921e5, type: 3}
   DialogObject: {fileID: 5145691382794934176, guid: fada6ad3bec7d004f936d976a560caba, type: 3}
   LoreDialog: {fileID: 8032961317910320448, guid: f4ae4d29dd8938c43aaa2791c254bf29, type: 3}
+  YZoomOffset: 1
   CanvasObject: {fileID: 8212510570731134455, guid: bbbc71315a8755b46beffdb708d5ada8, type: 3}
   FlyObject: {fileID: 8747210785273958949, guid: 88b948d922f66ba4b9992047e63372cf, type: 3}
 --- !u!212 &-154736084264090348

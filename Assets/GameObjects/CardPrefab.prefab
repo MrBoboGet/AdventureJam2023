@@ -38,7 +38,7 @@ RectTransform:
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
   m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 115.9, y: 261.3}
+  m_SizeDelta: {x: 90, y: 261.3}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &3307320930842157888
 CanvasRenderer:
@@ -92,6 +92,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   CardIndex: 0
   AssociatedHandler: {fileID: 0}
+  Hover: 0
 --- !u!61 &3307320930842157890
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -116,5 +117,5 @@ BoxCollider2D:
     adaptiveTiling: 0
   m_AutoTiling: 0
   serializedVersion: 2
-  m_Size: {x: 122.23, y: 257.47}
+  m_Size: {x: 92.41, y: 126.9}
   m_EdgeRadius: 0

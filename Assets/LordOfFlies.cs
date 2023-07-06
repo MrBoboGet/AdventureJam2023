@@ -78,25 +78,28 @@ public class LordOfFlies : OpponentScript
 
         LordOfFlies m_Lord;
 
+        int m_OptimalIndex = 0;
         public override void Initialize()
         {
             base.Initialize();
             AssociatedObject.transform.localPosition = m_HandStartPosition;
         }
-        public FlyHandAnimation(List<GameObject> Cards, OpponentScript Opponent) : base(Cards,Opponent)
+        public FlyHandAnimation(int BestCardIndex,List<GameObject> Cards, OpponentScript Opponent) : base(Cards,Opponent)
         {
             m_Lord = (LordOfFlies)Opponent;
             m_HandStartPosition = new Vector3(0, 800);
+            m_OptimalIndex = BestCardIndex;
         }
 
 
         Vector3 m_HandStartPosition = new Vector3();
-        float m_HandGrabY = 400;
+        float m_HandGrabY = 550;
         float m_ToPositionTime = 2f;
         float m_WaitDelay = 0.5f;
         float m_GrabSpeed = 1000f;
 
-        float m_HandLastY = 100;
+        //150 diff
+        float m_HandLastY = 250;
 
 
         int m_CardToGrabIndex = 2;
@@ -120,7 +123,7 @@ public class LordOfFlies : OpponentScript
                     if (m_Lord.m_FlyObjects.Count >= 3)
                     {
                         //take best card
-                        m_CardToGrabIndex = 1;//debug
+                        m_CardToGrabIndex = m_OptimalIndex;
                     }
                     else
                     {
@@ -156,9 +159,9 @@ public class LordOfFlies : OpponentScript
         }
     }
 
-    public override HandAnimation GetHandAnimation(List<GameObject> Cards, OpponentScript Opponent)
+    public override HandAnimation GetHandAnimation(PokerState CurrentState,List<GameObject> Cards, OpponentScript Opponent)
     {
-        return (new FlyHandAnimation(Cards, Opponent));
+        return (new FlyHandAnimation(p_GetBestCardIndex(CurrentState.PlayerHand),Cards, Opponent));
     }
     float m_FlySpawnDelay = 2f;
 

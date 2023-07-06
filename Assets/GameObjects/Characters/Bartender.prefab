@@ -143,6 +143,7 @@ MonoBehaviour:
   DialogText: {fileID: 4900000, guid: 70e008d9de35da74bb10f1d3c6579e2c, type: 3}
   DialogObject: {fileID: 5145691382794934176, guid: fada6ad3bec7d004f936d976a560caba, type: 3}
   LoreDialog: {fileID: 8032961317910320448, guid: f4ae4d29dd8938c43aaa2791c254bf29, type: 3}
+  YZoomOffset: 0.3
 --- !u!95 &1392094826569702267
 Animator:
   serializedVersion: 4
