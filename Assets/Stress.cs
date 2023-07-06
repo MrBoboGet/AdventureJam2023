@@ -39,9 +39,9 @@ public class Stress : MonoBehaviour
     {
         if (m_Locked) return;
         m_StressLevel -= 1;
-        if (m_StressLevel > m_TotalLevels)
+        if (m_StressLevel < 0)
         {
-            m_StressLevel = m_TotalLevels;
+            m_StressLevel = 0;
         }
         m_AssociatedTimer.MaxTime = m_BaseTime - (m_BaseTime - m_MaxTime) * ((float)m_StressLevel / m_TotalLevels);
         if (StressSprites != null)
@@ -52,11 +52,18 @@ public class Stress : MonoBehaviour
 
     public void ResetStress()
     {
-
+        if (m_Locked) return;
+        m_StressLevel = 0;
+        m_AssociatedTimer.MaxTime = m_BaseTime - (m_BaseTime - m_MaxTime) * ((float)m_StressLevel / m_TotalLevels);
+        if (StressSprites != null)
+        {
+            m_SpriteRenderer.sprite = StressSprites[m_StressLevel];
+        }
     }
     public void LockMaxStress()
     {
         m_StressLevel = m_TotalLevels;
+        m_AssociatedTimer.MaxTime = m_BaseTime - (m_BaseTime - m_MaxTime) * ((float)m_StressLevel / m_TotalLevels);
         if (StressSprites != null)
         {
             m_SpriteRenderer.sprite = StressSprites[m_StressLevel];

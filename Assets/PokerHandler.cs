@@ -236,6 +236,7 @@ public class PokerHandler : MonoBehaviour
         }
         else
         {
+            m_StressObject.ResetStress();
             m_CurrentPokerState.OpponentHP -= 1;
             m_OpponentObject.DisplayDialog("" + (3 - m_CurrentPokerState.OpponentHP), () =>
             {

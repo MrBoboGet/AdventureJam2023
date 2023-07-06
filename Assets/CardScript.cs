@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.EventSystems;
-public class CardScript : MonoBehaviour,IDragHandler,IDropHandler,IPointerEnterHandler,IPointerClickHandler,IPointerExitHandler
+public class CardScript : MonoBehaviour,IDragHandler,IEndDragHandler,IPointerEnterHandler,IPointerClickHandler,IPointerExitHandler
 {
     Vector2 m_OriginalPosition;
     public Card CardValue;
@@ -45,34 +45,6 @@ public class CardScript : MonoBehaviour,IDragHandler,IDropHandler,IPointerEnterH
     {
         gameObject.transform.position = m_OriginalPosition;
     }
-    public void OnDrop(PointerEventData eventData)
-    {
-        if(Hover)
-        {
-            return;
-        }
-        Camera GlobalCamera = FindObjectOfType<Camera>();
-        RaycastHit2D TableHit = Physics2D.Raycast(
-            GlobalCamera.ScreenToWorldPoint(eventData.position), GlobalCamera.transform.forward,Mathf.Infinity,1<<LayerMask.NameToLayer("Table"));
-        if(TableHit.collider == null)
-        {
-            //transform.position = m_OriginalPosition;
-            RaycastHit2D OpponentHit = Physics2D.Raycast(
-                GlobalCamera.ScreenToWorldPoint(eventData.position), GlobalCamera.transform.forward, Mathf.Infinity, 1 << LayerMask.NameToLayer("Opponent"));
-            if(OpponentHit.collider != null)
-            {
-                AssociatedHandler.CardDropped(this, DropType.Opponent);
-            }
-            else
-            {
-                ResetPosition();
-            }
-        }
-        else
-        {
-            AssociatedHandler.CardDropped(this, DropType.Table);
-        }
-    }
 
     public void OnPointerEnter(PointerEventData eventData)
     {
@@ -87,5 +59,34 @@ public class CardScript : MonoBehaviour,IDragHandler,IDropHandler,IPointerEnterH
     public void OnPointerExit(PointerEventData eventData)
     {
         AssociatedHandler.CardHoverLeave(this);
+    }
+
+    public void OnEndDrag(PointerEventData eventData)
+    {
+        if (Hover)
+        {
+            return;
+        }
+        Camera GlobalCamera = FindObjectOfType<Camera>();
+        RaycastHit2D TableHit = Physics2D.Raycast(
+            GlobalCamera.ScreenToWorldPoint(eventData.position), GlobalCamera.transform.forward, Mathf.Infinity, 1 << LayerMask.NameToLayer("Table"));
+        if (TableHit.collider == null)
+        {
+            //transform.position = m_OriginalPosition;
+            RaycastHit2D OpponentHit = Physics2D.Raycast(
+                GlobalCamera.ScreenToWorldPoint(eventData.position), GlobalCamera.transform.forward, Mathf.Infinity, 1 << LayerMask.NameToLayer("Opponent"));
+            if (OpponentHit.collider != null)
+            {
+                AssociatedHandler.CardDropped(this, DropType.Opponent);
+            }
+            else
+            {
+                ResetPosition();
+            }
+        }
+        else
+        {
+            AssociatedHandler.CardDropped(this, DropType.Table);
+        }
     }
 }

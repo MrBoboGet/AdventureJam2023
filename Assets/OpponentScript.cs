@@ -363,6 +363,10 @@ public class OpponentScript : MonoBehaviour
         {
             return;
         }
+        if(PossibleDialogs.Count == 0)
+        {
+            return;
+        }
         string DialogToDisplay = PossibleDialogs[Random.Range(0, PossibleDialogs.Count)];
         StartCoroutine(p_DisplayDialog(DialogToDisplay,DialougeDuration));
     }
