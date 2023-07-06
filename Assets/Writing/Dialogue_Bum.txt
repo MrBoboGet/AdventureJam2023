@@ -1,22 +1,28 @@
 #Whatever
 "Nice shoes"
 
+"Nice teeth."
+
 "Is that a gold tooth?"
 
 "I'm so hungry I could eat a horse... Or something else...
 
 "I bet it's real warm and cozy inside of you walls..."
 
-"Did you know? Flies make for great conversation partners."
+"Flies make for great conversation partners."
 
-"Do you think eating souls would be filling?"
+"Nice clothes."
+
+"You come here often?"
 
 #Win
 "Heh."
 
 #Lose
 "#¤%&/()=!#"&&?!!?"
+
 "Sleep with one eye open."
+
 "Hope you're still satisfied a day from now."
 
 #Fold
